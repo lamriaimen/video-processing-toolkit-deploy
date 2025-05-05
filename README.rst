@@ -47,14 +47,7 @@ You can install them via your package manager:
 
 Installation
 ------------
-
-Install from PyPI:
-
-.. code-block:: bash
-
-    pip install video_processing_toolkit
-
-Or install the latest version directly from GitHub:
+ install the latest version directly from GitHub:
 
 .. code-block:: bash
 
@@ -74,7 +67,7 @@ Usage
 Basic example:
 
 .. code-block:: python
-        
+
     # Extract all I-frames from a video and save them to the specified directory
     from video_processing_toolkit import VideoProcessor
     save_all_i_keyframes ("video.mp4", "/output_frames")
