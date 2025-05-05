@@ -2,7 +2,6 @@
 Video Processing Toolkit
 ========================
 
-
 .. image:: https://img.shields.io/pypi/v/video_processing_toolkit.svg
         :target: https://pypi.python.org/pypi/video_processing_toolkit
 
@@ -13,24 +12,94 @@ Video Processing Toolkit
         :target: https://video-processing-toolkit.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
-
 .. image:: https://pyup.io/repos/github/alyssia-fourali/video_processing_toolkit/shield.svg
      :target: https://pyup.io/repos/github/alyssia-fourali/video_processing_toolkit/
      :alt: Updates
 
-
-
 A Python toolkit for slicing, annotating, and processing video files for data analysis and machine learning.
-
 
 * Free software: MIT license
 * Documentation: https://video-processing-toolkit.readthedocs.io.
 
-
 Features
 --------
 
-* TODO
+* Extract and slice video into frames or clips
+* Add annotations or labels to specific frames
+* Convert between video formats
+* Resize and preprocess video for ML models
+* Batch processing of multiple videos
+* CLI and Python API support
+
+Prerequisites
+-------------
+
+Before installing, make sure the following dependencies are installed on your system:
+
+* `ffmpeg` and `ffprobe` – required for video decoding and analysis
+
+You can install them via your package manager:
+
+.. code-block:: bash
+
+    sudo apt install ffmpeg    # for Debian/Ubuntu
+    brew install ffmpeg        # for macOS
+
+Installation
+------------
+
+Install from PyPI:
+
+.. code-block:: bash
+
+    pip install video_processing_toolkit
+
+Or install the latest version directly from GitHub:
+
+.. code-block:: bash
+
+    pip install git+https://github.com/alyssia-fourali/video_processing_toolkit.git
+
+Or clone and install in editable mode:
+
+.. code-block:: bash
+
+    git clone https://github.com/alyssia-fourali/video_processing_toolkit.git
+    cd video_processing_toolkit
+    pip install -e .
+
+Usage
+-----
+
+Basic example:
+
+.. code-block:: python
+
+    from video_processing_toolkit import VideoProcessor
+
+    vp = VideoProcessor("input_video.mp4")
+    vp.slice_frames(output_dir="frames/", every_n_frames=10)
+    vp.annotate_frame(100, label="car")
+    vp.export_annotated_video("output_video.mp4")
+
+See the full documentation for detailed usage and advanced options.
+
+Contributing
+------------
+
+Contributions are welcome! To contribute:
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature-xyz`)
+3. Make your changes
+4. Submit a pull request
+
+Before submitting, please make sure to run tests and follow the project's coding standards.
+
+License
+-------
+
+This project is licensed under the MIT License - see the `LICENSE` file for details.
 
 Credits
 -------
