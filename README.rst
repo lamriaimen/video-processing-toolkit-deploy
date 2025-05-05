@@ -74,13 +74,10 @@ Usage
 Basic example:
 
 .. code-block:: python
-
+        
+    # Extract all I-frames from a video and save them to the specified directory
     from video_processing_toolkit import VideoProcessor
-
-    vp = VideoProcessor("input_video.mp4")
-    vp.slice_frames(output_dir="frames/", every_n_frames=10)
-    vp.annotate_frame(100, label="car")
-    vp.export_annotated_video("output_video.mp4")
+    save_all_i_keyframes ("video.mp4", "/output_frames")
 
 See the full documentation for detailed usage and advanced options.
 
