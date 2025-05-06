@@ -44,7 +44,7 @@ def test_save_all_i_keyframes_not_empty(tmp_path):
     video_path = "tests/video_test.mp4"
 
     output_dir = tmp_path
-    output_dir.mkdir(exist_ok=True)
+    #output_dir.mkdir(exist_ok=True)
 
     save_all_i_keyframes(video_path, str(output_dir))
     output_files = list(output_dir.iterdir())
@@ -114,4 +114,22 @@ def test_save_all_p_keyframes_gets_only_pframes(tmp_path):
 
     frame_types = dict(get_frame_types(video_path))
 
-    assert all(frame_types[num] == 'P' for num in frame_numbers)    
+    assert all(frame_types[num] == 'P' for num in frame_numbers)
+
+
+    
+# def test_all_i_keyframes_between_two_timestamps(tmp_path):
+#     video_path = "tests/video_test.mp4"
+    
+#     start_time = "00:00:01"
+#     end_time = "00:00:03"
+
+#     cap = cv2.VideoCapture(video_path)
+#     fps = cap.get(cv2.CAP_PROP_FPS)
+
+#     assert fps > 0
+#     cap.release()
+
+#     save_all_i_keyframes_between_two_timestamps(video_path, tmp_path)
+
+#     output_files = list(tmp_path.iterdir())    
