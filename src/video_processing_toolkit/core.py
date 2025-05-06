@@ -61,9 +61,9 @@ def save_all_i_keyframes(video_file, path_out):
 
 
 def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_start, hh_mm_ss_end):
-    """Function to extract  and save all the i-key frames of a complete video
+    """Function to extract and save all the all I-frames of a complete video as image files between two timestamps.
     Args:
-        video_file: Input video file.
+        video_file(str): Path to the input video file.
         path_out: The output folder to save all the output frames
         hh_mm_ss_start: the time starting time stamp
         hh_mm_ss_end: the time ending time stamp
