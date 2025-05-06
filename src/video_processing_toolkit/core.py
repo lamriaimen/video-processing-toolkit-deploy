@@ -27,15 +27,16 @@ def get_frame_types(video_file):
 
 
 def save_all_i_keyframes(video_file, path_out):
-    """Function to extract  and save all the i-key frames of a complete video
+    """Function to extract and save all I-frames of a complete video as image files.
     Args:
-        video_file: Input video file.
-        path_out: The output folder to save all the output frames
-    Returns:
+        video_file(str): Path to the input video file.
+        path_out(str): The output folder to save all the extracted frames.
+    Returns: 
         None
     """
     frame_types = get_frame_types(video_file)
     i_frames = [x[0] for x in frame_types if x[1] == 'I']
+
     if i_frames:
         # basename = os.path.splitext(os.path.basename(video_file))[0]
         cap = cv2.VideoCapture(video_file)
@@ -45,12 +46,12 @@ def save_all_i_keyframes(video_file, path_out):
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
             ret, frame = cap.read()
 
-            create_img_name = str(blank_cnt) + "::" + "-frame_" + str(frame_no) + ".jpg"
+            create_img_name = "/" + str(blank_cnt) + "::" + "-frame_" + str(frame_no) + ".jpg"
 
             full_frame_saving_path = path_out + create_img_name
             cv2.imwrite(full_frame_saving_path, frame)
 
-            # print('Saved: ' + full_frame_saving_path)
+            print('Saved: ' + full_frame_saving_path)
 
             blank_cnt = blank_cnt + 1
         cap.release()
