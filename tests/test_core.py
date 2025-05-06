@@ -2,6 +2,11 @@
 
 """Tests for `video_processing_toolkit` package."""
 
+import video_processing_toolkit.core
+print(video_processing_toolkit.core.__file__)
+
+
+from pathlib import Path
 import pytest
 from unittest.mock import patch
 
@@ -34,3 +39,25 @@ def test_get_frame_types_fails_when_invalid_video(mock_check_output):
     with pytest.raises(subprocess.CalledProcessError):
         get_frame_types("invalid_video.mp4")
 
+
+def test_save_all_i_keyframes_not_empty(tmp_path):
+    video_path = "tests/video_test.mp4"
+
+    output_dir = tmp_path
+    output_dir.mkdir(exist_ok=True)
+
+    save_all_i_keyframes(video_path, str(output_dir))
+    output_files = list(output_dir.iterdir())
+
+    assert len(output_files) > 0
+
+def test_save_all_i_keyframes_creates_jpg_files(tmp_path):
+    video_path = "tests/video_test.mp4"
+
+    output_dir = tmp_path
+    output_dir.mkdir(exist_ok=True)
+
+    save_all_i_keyframes(video_path, str(output_dir))
+    output_files = list(output_dir.iterdir())
+
+    assert all(f.suffix.lower() == ".jpg" for f in output_files)
