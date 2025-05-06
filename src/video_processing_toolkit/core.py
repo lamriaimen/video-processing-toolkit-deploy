@@ -124,9 +124,9 @@ def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
 
 
 def save_all_p_keyframes(video_file, path_out):
-    """Function to extract  and save all the p-key frames of a complete video
+    """Function to extract all P-frames from a complete video as image files.
     Args:
-        video_file: Input video file.
+        video_file(str): Path to the input video file.
         path_out: The output folder to save all the output frames
 
     Returns:
@@ -143,7 +143,7 @@ def save_all_p_keyframes(video_file, path_out):
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
             ret, frame = cap.read()
 
-            create_img_name = str(blank_cnt) + "::" + "-frame_" + str(frame_no) + ".jpg"
+            create_img_name = "/" + str(blank_cnt) + "::" + "-frame_" + str(frame_no) + ".jpg"
 
             full_frame_saving_path = path_out + "/" + create_img_name
             cv2.imwrite(full_frame_saving_path, frame)
