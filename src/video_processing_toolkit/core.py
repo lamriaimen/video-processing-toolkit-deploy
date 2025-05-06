@@ -8,6 +8,18 @@ import subprocess
 
 
 def get_frame_types(video_file):
+    """
+    Function to extract the type of each frame in a video using ffprobe
+    The frame types are typically:
+    - 'I' (Intra-coded): A full image.
+    - 'P'(Predicted): Stores only the difference from the previous frame.
+    - 'B' (Bidirectional): Stores differences using both previous and next frames.
+    Args:
+        video_file (str): Path to the input video file.
+    Returns:
+        zip: A zip object containing tuples of (frame_index, frame_type),
+             where frame_index is an integer and frame_type is a string ('I', 'P', 'B').
+    """
     command = 'ffprobe -v error -show_entries frame=pict_type -of default=noprint_wrappers=1'.split()
     out = subprocess.check_output(command + [video_file]).decode()
     frame_types = out.replace('pict_type=', '').split()
