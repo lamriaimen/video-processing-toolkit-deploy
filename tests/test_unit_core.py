@@ -94,3 +94,96 @@ def test_save_all_p_keyframes_with_no_iframes(mock_imwrite, mock_VideoCapture, m
     save_all_p_keyframes("fake_video.mp4", str(tmp_path))
 
     mock_imwrite.assert_not_called()
+
+
+@patch("video_processing_toolkit.core.ffmpy.FFmpeg.run")
+@patch("video_processing_toolkit.core.ffmpy.FFmpeg")
+@patch("video_processing_toolkit.core.time.strftime")
+def test_convert_video_builds_correct_avi_filename(mock_strftime, mock_ffmpeg_class, mock_run):
+    mock_strftime.return_value = "20240506-154500"
+
+    mock_ffmpeg = MagicMock()
+    mock_ffmpeg_class.return_value = mock_ffmpeg
+
+    output_filename = convert_video("fake_input.mp4")
+
+    assert output_filename == "20240506-154500.avi"
+
+    mock_ffmpeg_class.assert_called_once_with(
+        inputs={"fake_input.mp4": None},
+        outputs={"20240506-154500.avi": " -c:a mp3 -c:v mpeg4"}
+    )
+
+    mock_ffmpeg.run.assert_called_once()
+
+@patch("video_processing_toolkit.core.ffmpy.FFmpeg.run")
+@patch("video_processing_toolkit.core.ffmpy.FFmpeg")
+@patch("video_processing_toolkit.core.time.strftime")
+def test_convert_video_builds_correct_ffmpeg_command(mock_strftime, mock_ffmpeg_class, mock_run):
+    mock_strftime.return_value = "20240506-154500"
+
+    mock_ffmpeg = MagicMock()
+    mock_ffmpeg_class.return_value = mock_ffmpeg
+
+    output_filename = convert_video("fake_input.mp4")
+
+    mock_ffmpeg_class.assert_called_once_with(
+        inputs={"fake_input.mp4": None},
+        outputs={"20240506-154500.avi": " -c:a mp3 -c:v mpeg4"}
+    )
+
+@patch("video_processing_toolkit.core.ffmpy.FFmpeg.run")
+@patch("video_processing_toolkit.core.ffmpy.FFmpeg")
+@patch("video_processing_toolkit.core.time.strftime")
+def test_convert_video_executes_ffmpeg_command(mock_strftime, mock_ffmpeg_class, mock_run):
+    mock_strftime.return_value = "20240506-154500"
+
+    mock_ffmpeg = MagicMock()
+    mock_ffmpeg_class.return_value = mock_ffmpeg
+
+    output_filename = convert_video("fake_input.mp4")
+
+    mock_ffmpeg.run.assert_called_once()
+
+@patch("video_processing_toolkit.core.os.path.isfile", return_value=True)
+@patch("video_processing_toolkit.core.os.listdir", return_value=["frame_1.jpg", "frame_2.jpg", "frame_3.jpg"])
+@patch("video_processing_toolkit.core.cv2.imread")
+@patch("video_processing_toolkit.core.cv2.VideoWriter")
+def test_frames_to_video_reads_images(mock_writer, mock_imread, mock_listdir, mock_isfile):
+    fake_img = np.ones((480, 640, 3), dtype=np.uint8)
+    mock_imread.return_value = fake_img
+
+    frames_to_video("frames/", "output.avi", fps=30)
+
+    assert mock_imread.call_count == 3
+
+@patch("video_processing_toolkit.core.os.path.isfile", return_value=True)
+@patch("video_processing_toolkit.core.os.listdir", return_value=["frame_1.jpg", "frame_2.jpg"])
+@patch("video_processing_toolkit.core.cv2.imread")
+@patch("video_processing_toolkit.core.cv2.VideoWriter")
+def test_frames_to_video_writes_all_frames(mock_writer_class, mock_imread, mock_listdir, mock_isfile):
+    fake_img = np.ones((480, 640, 3), dtype=np.uint8)
+    mock_imread.return_value = fake_img
+
+    writer = MagicMock()
+    mock_writer_class.return_value = writer
+
+    frames_to_video("frames/", "output.avi", fps=30)
+
+    assert writer.write.call_count == 2
+
+@patch("video_processing_toolkit.core.os.path.isfile", return_value=True)
+@patch("video_processing_toolkit.core.os.listdir", return_value=["frame_1.jpg"])
+@patch("video_processing_toolkit.core.cv2.imread")
+@patch("video_processing_toolkit.core.cv2.VideoWriter")
+def test_frames_to_video_releases_video_writer(mock_writer_class, mock_imread, mock_listdir, mock_isfile):
+    fake_img = np.ones((480, 640, 3), dtype=np.uint8)
+    mock_imread.return_value = fake_img
+
+    writer = MagicMock()
+    mock_writer_class.return_value = writer
+
+    frames_to_video("frames/", "output.avi", fps=30)
+
+    writer.release.assert_called_once()
+
