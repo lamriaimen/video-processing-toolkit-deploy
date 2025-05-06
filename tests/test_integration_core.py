@@ -93,9 +93,11 @@ def test_save_all_p_keyframes_gets_only_pframes(tmp_path):
     
 def test_all_i_keyframes_between_two_timestamps_not_empty(tmp_path):
     video_path = "tests/video_test.mp4"
+
+    output_files=tmp_path
     
-    start_time = "00:00:01"
-    end_time = "00:00:03"
+    start_time = "00:00:05"
+    end_time = "00:00:15"
 
     cap = cv2.VideoCapture(video_path)
     fps = cap.get(cv2.CAP_PROP_FPS)
@@ -103,18 +105,18 @@ def test_all_i_keyframes_between_two_timestamps_not_empty(tmp_path):
     assert fps > 0
     cap.release()
 
-    save_all_i_keyframes_between_two_timestamps(video_path, tmp_path, start_time , end_time)
+    save_all_i_keyframes_between_two_timestamps(video_path, str(output_files), start_time , end_time)
 
-    output_files = list(tmp_path.iterdir())
-    assert len(output_files) > 0
-    assert len(output_files) <= fps * 3
+    output = list(tmp_path.iterdir())
+    assert len(output) > 0
+    assert len(output) <= fps * 10
 
 def test_all_i_keyframes_between_two_timestamps_creates_jpg_files(tmp_path):
     video_path = "tests/video_test.mp4"
-    start_time = "00:00:01"
-    end_time = "00:00:03"
+    start_time = "00:00:00"
+    end_time = "00:00:05"
 
-    save_all_i_keyframes_between_two_timestamps(video_path, tmp_path, start_time , end_time)
+    save_all_i_keyframes_between_two_timestamps(video_path, str(tmp_path), start_time , end_time)
 
     output_files = list(tmp_path.iterdir())
     assert all(f.suffix.lower() == ".jpg" for f in output_files)
