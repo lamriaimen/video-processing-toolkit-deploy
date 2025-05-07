@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from unittest.mock import MagicMock, patch
 
-from src.video_processing_toolkit import *
+from video_processing_toolkit import *
 
 @patch("subprocess.check_output")
 def test_get_frame_types_returns_expected_values(mock_check_output):
@@ -286,5 +286,62 @@ def test_extract_images_regular_interval_releases_video(mock_imwrite, mock_Video
     mock_VideoCapture.return_value = mock_cap
 
     extract_images_regular_interval("video.mp4", "output_dir", 5)
+
+    mock_cap.release.assert_called_once()
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_extract_images_between_two_timestamps_position_cursor_at_start_timestamp(mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+
+    mock_cap.read.side_effect = [
+        (True, "frame1"),  
+        (False, None)      
+    ]
+
+    extract_images_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:10")
+
+    mock_cap.set.assert_called_once_with(cv2.CAP_PROP_POS_MSEC, 5000)
+
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_extract_frames_between_two_timestamps(mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_cap.get.return_value = 30  #30 FPS
+    mock_cap.read.side_effect = [
+        (True, "frame1"),
+        (True, "frame2"),
+        (False, None)
+    ]
+    mock_VideoCapture.return_value = mock_cap
+
+    extract_images_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:10")
+
+    assert mock_imwrite.call_count == 2
+
+    expected_files = [
+        "output_dir/%#05d.jpg" % 122,
+        "output_dir/%#05d.jpg" % 123
+    ]
+
+    actual_files = [call[0][0] for call in mock_imwrite.call_args_list]
+    assert actual_files == expected_files
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_extract_frames_between_two_timestamps_stops_reading_after_last_timestamp(mock_imwrite, mock_VideoCapture):
+
+    mock_cap = MagicMock()
+    
+    mock_cap.get.return_value = 30  # 30 FPS
+
+    mock_cap.read.side_effect = [(True, f"frame{i}") for i in range(180)] + [(False, None)]
+    mock_VideoCapture.return_value = mock_cap
+
+    extract_images_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:06")
+
+    assert mock_imwrite.call_count == 60
 
     mock_cap.release.assert_called_once()
