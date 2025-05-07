@@ -15,6 +15,14 @@ Video Processing Toolkit
 .. image:: https://pyup.io/repos/github/alyssia-fourali/video_processing_toolkit/shield.svg
      :target: https://pyup.io/repos/github/alyssia-fourali/video_processing_toolkit/
      :alt: Updates
+.. image:: https://github.com/<your-user>/<your-repo>/actions/workflows/ci.yml/badge.svg
+   :alt: CI
+
+.. image:: https://github.com/<your-user>/<your-repo>/actions/workflows/release.yml/badge.svg
+   :alt: Release
+
+.. image:: https://codecov.io/gh/<your-user>/<your-repo>/branch/main/graph/badge.svg
+   :alt: Coverage
 
 A Python toolkit for slicing, annotating, and processing video files for data analysis and machine learning.
 
