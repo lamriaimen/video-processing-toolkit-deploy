@@ -152,6 +152,10 @@ __pypackages__/
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
+# Sphinx build outputs
+/docs/_build/
+/docs/build/
+/docs/api/*.html
 
 # SageMath parsed files
 *.sage.py
