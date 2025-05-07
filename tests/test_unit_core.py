@@ -522,3 +522,33 @@ def test_save_all_p_keyframes_between_two_timestamps_only_saves_pframes(mock_get
     ]
     actual_files = [call[0][0] for call in mock_imwrite.call_args_list]
     assert actual_files == expected_files
+
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.__version__", "4.5.2")
+def test_compute_frame_per_sec_rate_opencv_v3(mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    
+    mock_cap.get.return_value = 30
+
+    fps = compute_frame_per_sec_rate(mock_cap)
+
+    mock_cap.get.assert_called_once_with(cv2.CAP_PROP_FPS)
+    assert fps == 30
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.__version__", "2.4.13")
+def test_compute_frame_per_sec_rate_opencv_v2(mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+
+    cv2.cv = MagicMock()
+    cv2.cv.CV_CAP_PROP_FPS = 5
+
+    mock_cap.get.return_value = 25
+
+    fps = compute_frame_per_sec_rate(mock_cap)
+
+    mock_cap.get.assert_called_once_with(cv2.cv.CV_CAP_PROP_FPS)
+    assert fps == 25
