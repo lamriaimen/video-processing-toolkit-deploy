@@ -246,3 +246,49 @@ def test_video_to_all_frames_output_file_names(mock_imwrite, mock_VideoCapture, 
         "output_dir/%#05d.jpg" % 3,
     ]
 
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_extract_images_regular_interval_creates_images(mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_cap.read.side_effect = [(True, "frame1"), (True, "frame2"), (False, None)]
+    mock_VideoCapture.return_value = mock_cap
+
+    extract_images_regular_interval("video.mp4", "output_dir", 5)
+
+    assert mock_imwrite.call_count == 2
+    expected_files = [
+        "output_dir/%#05d.jpg" % 1,
+        "output_dir/%#05d.jpg" % 2
+    ]
+    actual_files = [call[0][0] for call in mock_imwrite.call_args_list]
+    assert actual_files == expected_files
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_extract_images_regular_interval_sets_correct_position_in_the_video(mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_cap.read.side_effect = [
+        (True, "frame1"),
+        (True, "frame2"),
+        (True, "frame3"),
+        (False, None)
+    ]
+    mock_VideoCapture.return_value = mock_cap
+
+    extract_images_regular_interval("video.mp4", "output_dir", 5)
+
+    mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_MSEC, 0 * 5000)
+    mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_MSEC, 1 * 5000)
+    mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_MSEC, 2 * 5000)
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_extract_images_regular_interval_releases_video(mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_cap.read.side_effect = [(True, "frame1"), (False, None)]
+    mock_VideoCapture.return_value = mock_cap
+
+    extract_images_regular_interval("video.mp4", "output_dir", 5)
+
+    mock_cap.release.assert_called_once()
