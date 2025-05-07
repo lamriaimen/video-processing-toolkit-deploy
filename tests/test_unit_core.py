@@ -187,3 +187,62 @@ def test_frames_to_video_releases_video_writer(mock_writer_class, mock_imread, m
 
     writer.release.assert_called_once()
 
+@patch("video_processing_toolkit.core.os.mkdir")
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_video_to_all_frames_creates_output_dir(mock_imwrite, mock_VideoCapture, mock_mkdir):
+    mock_cap = MagicMock()
+    mock_cap.get.return_value = 1
+    mock_cap.isOpened.return_value = False
+    mock_VideoCapture.return_value = mock_cap
+
+    video_to_all_frames("video.mp4", "output_dir")
+    mock_mkdir.assert_called_once_with("output_dir")
+
+@patch("video_processing_toolkit.core.os.mkdir")
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_video_to_all_frames_reads_frames_correctly(mock_imwrite, mock_VideoCapture, mock_mkdir):
+    mock_cap = MagicMock()
+    mock_cap.get.return_value = 4
+    mock_cap.isOpened.side_effect = [True, True, True, False]
+    mock_cap.read.side_effect = [(True, "f1"), (True, "f2"), (True, "f3"), (False, None)]
+    mock_VideoCapture.return_value = mock_cap
+
+    video_to_all_frames("video.mp4", "output_dir")
+
+    assert mock_cap.read.call_count == 3
+
+@patch("video_processing_toolkit.core.os.mkdir")
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_video_to_all_frames_writes_frames(mock_imwrite, mock_VideoCapture, mock_mkdir):
+    mock_cap = MagicMock()
+    mock_cap.get.return_value = 4
+    mock_cap.isOpened.side_effect = [True, True, True, False]
+    mock_cap.read.side_effect = [(True, "f1"), (True, "f2"), (True, "f3"), (False, None)]
+    mock_VideoCapture.return_value = mock_cap
+
+    video_to_all_frames("video.mp4", "output_dir")
+
+    assert mock_imwrite.call_count == 3
+
+@patch("video_processing_toolkit.core.os.mkdir")
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_video_to_all_frames_output_file_names(mock_imwrite, mock_VideoCapture, mock_mkdir):
+    mock_cap = MagicMock()
+    mock_cap.get.return_value = 4
+    mock_cap.isOpened.side_effect = [True, True, True, False]
+    mock_cap.read.side_effect = [(True, "f1"), (True, "f2"), (True, "f3"), (False, None)]
+    mock_VideoCapture.return_value = mock_cap
+
+    video_to_all_frames("video.mp4", "output_dir")
+
+    calls = [call[0][0] for call in mock_imwrite.call_args_list]
+    assert calls == [
+        "output_dir/%#05d.jpg" % 1,
+        "output_dir/%#05d.jpg" % 2,
+        "output_dir/%#05d.jpg" % 3,
+    ]
+
