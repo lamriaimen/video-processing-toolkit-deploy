@@ -2,15 +2,11 @@
 
 """Tests for `video_processing_toolkit` package."""
 
-import video_processing_toolkit.core
-print(video_processing_toolkit.core.__file__)
-
-
 from pathlib import Path
 import pytest
 from unittest.mock import patch
 
-from video_processing_toolkit import *
+from src.video_processing_toolkit import *
 
 def test_ffmpeg_tools_installed():
     try:
