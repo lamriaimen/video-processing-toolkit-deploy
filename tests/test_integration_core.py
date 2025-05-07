@@ -12,17 +12,26 @@ from unittest.mock import patch
 
 from video_processing_toolkit import *
 
+def test_ffmpeg_tools_installed():
+    try:
+        check_ffmpeg_tools_available()
+    except EnvironmentError as e:
+        pytest.fail(str(e))
+
 
 def test_save_all_i_keyframes_not_empty(tmp_path):
-    video_path = "tests/video_test.mp4"
+    check_ffmpeg_tools_available()
 
+    video_path = "tests/video_test.mp4"
     output_dir = tmp_path
-    #output_dir.mkdir(exist_ok=True)
 
     save_all_i_keyframes(video_path, str(output_dir))
+
     output_files = list(output_dir.iterdir())
+    print(f"Fichiers dans {output_dir}: {[str(p) for p in output_dir.iterdir()]}")
 
     assert len(output_files) > 0
+
 
 def test_save_all_i_keyframes_creates_jpg_files(tmp_path):
     video_path = "tests/video_test.mp4"

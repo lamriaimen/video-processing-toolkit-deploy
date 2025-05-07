@@ -6,6 +6,13 @@ import ffmpy
 import numpy as np
 import subprocess
 
+import shutil
+
+def check_ffmpeg_tools_available():
+    for tool in ["ffmpeg", "ffprobe"]:
+        if shutil.which(tool) is None:
+            raise EnvironmentError(f"L'outil '{tool}' n'est pas disponible dans le PATH.")
+
 
 def get_frame_types(video_file):
     """
@@ -46,7 +53,7 @@ def save_all_i_keyframes(video_file, path_out):
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
             ret, frame = cap.read()
 
-            create_img_name = "/" + str(blank_cnt) + "::" + "-frame_" + str(frame_no) + ".jpg"
+            create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
 
             full_frame_saving_path = path_out + create_img_name
             cv2.imwrite(full_frame_saving_path, frame)
@@ -109,7 +116,7 @@ def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
                 ret, frame = cap.read()
 
-                create_img_name = "/" + str(blank_cnt) + "::" + "-frame_" + str(frame_no) + ".jpg"
+                create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
 
                 full_frame_saving_path = path_out + "/" + create_img_name
                 cv2.imwrite(full_frame_saving_path, frame)
@@ -143,7 +150,7 @@ def save_all_p_keyframes(video_file, path_out):
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
             ret, frame = cap.read()
 
-            create_img_name = "/" + str(blank_cnt) + "::" + "-frame_" + str(frame_no) + ".jpg"
+            create_img_name = "/" + str(blank_cnt) +"frame_" + str(frame_no) + ".jpg"
 
             full_frame_saving_path = path_out + "/" + create_img_name
             cv2.imwrite(full_frame_saving_path, frame)
@@ -206,7 +213,7 @@ def save_all_p_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
                 ret, frame = cap.read()
 
-                create_img_name = "/" + str(blank_cnt) + "::" + "-frame_" + str(frame_no) + ".jpg"
+                create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
 
                 full_frame_saving_path = path_out + "/" + create_img_name
                 cv2.imwrite(full_frame_saving_path, frame)
