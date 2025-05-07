@@ -1,9 +1,18 @@
 name: Build & Deploy Docs
 
+# Run on pushes to main (for build & deploy) and on PRs (for build only)
 on:
   push:
-    branches: [ main ]    # change if your default branch is named differently
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
+
+# Grant only what we need
+permissions:
+  contents: read      # for checkout
+  pages: write        # to push to gh-pages
 
 jobs:
   docs:
@@ -12,8 +21,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # full history, needed for gh-pages action
 
-      - name: Setup Python
+      - name: Setup Python 3.x
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
@@ -26,14 +37,18 @@ jobs:
 
       - name: Generate API stubs
         run: |
-          sphinx-apidoc --module-first --separate --output-dir docs/api src/video_processing_toolkit
+          sphinx-apidoc \
+            --module-first \
+            --separate \
+            --output-dir docs/api \
+            src/video_processing_toolkit
 
       - name: Build HTML documentation
         working-directory: docs
         run: make html
 
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main'
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
