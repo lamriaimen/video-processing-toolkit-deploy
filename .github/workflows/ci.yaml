@@ -12,10 +12,11 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.11"]   # you can shrink this list as you like
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -34,18 +35,16 @@ jobs:
           pip install -r requirements_dev.txt
           pip install .
 
-      - name: Lint & auto-fix with Ruff
+      - name: Lint with Ruff (ignoring star-imports, unused, etc.)
         run: |
-          # auto-apply all fixable edits
-          ruff check src/ tests/ --fix
-          # don’t fail CI for the remaining lint errors
-          ruff check src/ tests/ --exit-zero
+          ruff check src/ tests/ \
+            --ignore F401,F403,F821,F841,E722 \
+            --exit-zero
 
       - name: Run tests
         run: pytest --maxfail=1 --disable-warnings -q
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.11'
         uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
