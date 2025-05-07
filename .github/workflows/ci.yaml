@@ -8,10 +8,12 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.11"]  # dropped 3.10
+        python-version: ["3.8", "3.9", "3.11"]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,6 +44,5 @@ jobs:
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.11'
         uses: codecov/codecov-action@v3
-        # no token needed for public repos
         with:
           fail_ci_if_error: true
