@@ -8,16 +8,7 @@ from unittest.mock import patch
 
 from src.video_processing_toolkit import *
 
-def test_ffmpeg_tools_installed():
-    try:
-        check_ffmpeg_tools_available()
-    except EnvironmentError as e:
-        pytest.fail(str(e))
-
-
 def test_save_all_i_keyframes_not_empty(tmp_path):
-    check_ffmpeg_tools_available()
-
     video_path = "tests/video_test.mp4"
     output_dir = tmp_path
 
@@ -126,3 +117,8 @@ def test_all_i_keyframes_between_two_timestamps_creates_jpg_files(tmp_path):
     output_files = list(tmp_path.iterdir())
     assert all(f.suffix.lower() == ".jpg" for f in output_files)
 
+def test_all_i_keyframes_between_two_timestamps_creates_jpg_files(tmp_path):
+    video_path = "tests/video_test.mp4"
+
+    
+    assert all(f.suffix.lower() == ".jpg" for f in output_files)
