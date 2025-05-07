@@ -117,8 +117,3 @@ def test_all_i_keyframes_between_two_timestamps_creates_jpg_files(tmp_path):
     output_files = list(tmp_path.iterdir())
     assert all(f.suffix.lower() == ".jpg" for f in output_files)
 
-def test_all_i_keyframes_between_two_timestamps_creates_jpg_files(tmp_path):
-    video_path = "tests/video_test.mp4"
-
-    
-    assert all(f.suffix.lower() == ".jpg" for f in output_files)
