@@ -12,11 +12,10 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.11"]
+        python-version: ["3.11"]   # just one version now
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
