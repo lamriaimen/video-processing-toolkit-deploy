@@ -345,3 +345,180 @@ def test_extract_frames_between_two_timestamps_stops_reading_after_last_timestam
     assert mock_imwrite.call_count == 60
 
     mock_cap.release.assert_called_once()
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.get_frame_types")
+def test_save_all_i_keyframes_between_two_timestamps_starts_at_first_timestamp(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30  # 30 FPS 
+
+    mock_get_frame_types.return_value = [
+        (121, 'I'), 
+        (150, 'I'), 
+        (180, 'I')
+    ]
+
+    mock_cap.read.side_effect = [
+        (True, "frame_121"),
+        (True, "frame_150"),
+        (True, "frame_180"),
+        (False, None)  
+    ]
+
+    save_all_i_keyframes_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:06")
+
+    mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_FRAMES, 121)
+
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.get_frame_types")
+def test_save_all_i_keyframes_between_two_timestamps_stops_at_last_timestamp(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30  # 30 FPS 
+
+    mock_get_frame_types.return_value = [
+        (121, 'I'), 
+        (150, 'I'), 
+        (180, 'I'),
+        (181, 'I')  
+    ]
+
+    mock_cap.read.side_effect = [
+        (True, "frame_121"),
+        (True, "frame_150"),
+        (True, "frame_180"),
+        (True, "frame_181"),
+        (False, None)  
+    ]
+
+    save_all_i_keyframes_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:06")
+
+    calls = [call[0][1] for call in mock_cap.set.call_args_list]
+    assert 181 not in calls
+
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.get_frame_types")
+def test_save_all_i_keyframes_between_two_timestamps_only_saves_iframes(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30  # 30 FPS 
+
+    mock_get_frame_types.return_value = [
+        (121, 'I'), 
+        (125, 'P'), 
+        (150, 'I'), 
+        (155, 'P'), 
+        (180, 'I')
+    ]
+
+    mock_cap.read.side_effect = [
+        (True, "frame_121"),
+        (True, "frame_150"),
+        (True, "frame_180"),
+        (False, None)  
+    ]
+
+    save_all_i_keyframes_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:06")
+
+    expected_files = [
+        "output_dir//0frame_121.jpg",
+        "output_dir//1frame_150.jpg",
+        "output_dir//2frame_180.jpg"
+    ]
+    actual_files = [call[0][0] for call in mock_imwrite.call_args_list]
+    assert actual_files == expected_files
+
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.get_frame_types")
+def test_save_all_p_keyframes_between_two_timestamps_starts_at_first_timestamp(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30  # 30 FPS 
+
+    mock_get_frame_types.return_value = [
+        (121, 'P'), 
+        (150, 'P'), 
+        (180, 'P')
+    ]
+
+    mock_cap.read.side_effect = [
+        (True, "frame_121"),
+        (True, "frame_150"),
+        (True, "frame_180"),
+        (False, None)  
+    ]
+
+    save_all_p_keyframes_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:06")
+
+    mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_FRAMES, 121)
+
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.get_frame_types")
+def test_save_all_p_keyframes_between_two_timestamps_stops_at_last_timestamp(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30  # 30 FPS 
+
+    mock_get_frame_types.return_value = [
+        (121, 'P'), 
+        (150, 'P'), 
+        (180, 'P'),
+        (181, 'P')  
+    ]
+
+    mock_cap.read.side_effect = [
+        (True, "frame_121"),
+        (True, "frame_150"),
+        (True, "frame_180"),
+        (True, "frame_181"),
+        (False, None)  
+    ]
+
+    save_all_p_keyframes_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:06")
+
+    calls = [call[0][1] for call in mock_cap.set.call_args_list]
+    assert 181 not in calls
+
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.get_frame_types")
+def test_save_all_p_keyframes_between_two_timestamps_only_saves_pframes(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30  # 30 FPS 
+
+    mock_get_frame_types.return_value = [
+        (121, 'P'), 
+        (125, 'B'), 
+        (150, 'P'), 
+        (155, 'B'), 
+        (180, 'P')
+    ]
+
+    mock_cap.read.side_effect = [
+        (True, "frame_121"),
+        (True, "frame_150"),
+        (True, "frame_180"),
+        (False, None)  
+    ]
+
+    save_all_p_keyframes_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:06")
+
+    expected_files = [
+        "output_dir//0frame_121.jpg",
+        "output_dir//1frame_150.jpg",
+        "output_dir//2frame_180.jpg"
+    ]
+    actual_files = [call[0][0] for call in mock_imwrite.call_args_list]
+    assert actual_files == expected_files
