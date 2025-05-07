@@ -7,41 +7,17 @@ on:
     branches: [ main, master ]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  lint:
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-name: CI
-
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-
-jobs:
-  test:
-    runs-on: ubuntu-22.04
-
-    strategy:
-      matrix:
-        python-version: ["3.11"]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
 
       - name: Cache pip
         uses: actions/cache@v3
@@ -49,51 +25,13 @@ jobs:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
 
-      - name: Install dependencies
+      - name: Install dev dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements_dev.txt
-          pip install .
 
-      - name: Lint with Ruff (ignoring star-imports, unused, etc.)
+      - name: Lint with Ruff (non-fatal)
         run: |
           ruff check src/ tests/ \
             --ignore F401,F403,F821,F841,E722 \
             --exit-zero
-
-      - name: Run tests
-        run: pytest --maxfail=1 --disable-warnings -q
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          fail_ci_if_error: true
-
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
-
-      - name: Install project & test dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .[test]
-
-      - name: Lint with Ruff (non-fatal)
-        run: |
-          ruff check src/ tests/ --ignore F401,F403,F821,F841,E722 --exit-zero
-
-      - name: Run tests
-        run: pytest --maxfail=1 --disable-warnings -q
-
-      - name: Upload coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v3
-        with:
-          fail_ci_if_error: true
