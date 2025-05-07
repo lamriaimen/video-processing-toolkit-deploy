@@ -270,8 +270,8 @@ def frames_to_video(input_path, output_path, fps):
     """
     image_array = []
     files = [f for f in os.listdir(input_path) if os.path.isfile(os.path.join(input_path, f))]
-    files.sort(key=lambda x: int(x[5:-4]))
-
+    files.sort(key=lambda x: int(x.split("_")[1].split(".")[0])) 
+       
     for i in range(len(files)):
         img = cv2.imread(input_path + files[i])
         size = (img.shape[1], img.shape[0])
