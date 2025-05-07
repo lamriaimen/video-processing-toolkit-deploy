@@ -6,14 +6,6 @@ import ffmpy
 import numpy as np
 import subprocess
 
-import shutil
-
-def check_ffmpeg_tools_available():
-    for tool in ["ffmpeg", "ffprobe"]:
-        if shutil.which(tool) is None:
-            raise EnvironmentError(f"L'outil '{tool}' n'est pas disponible dans le PATH.")
-
-
 def get_frame_types(video_file):
     """
     Function to extract the type of each frame in a video using ffprobe
