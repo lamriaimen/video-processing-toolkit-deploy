@@ -1,6 +1,5 @@
 name: Build & Deploy Docs
 
-# Run on pushes to main (for build & deploy) and on PRs (for build only)
 on:
   push:
     branches:
@@ -9,10 +8,9 @@ on:
     branches:
       - main
 
-# Grant only what we need
 permissions:
-  contents: read      # for checkout
-  pages: write        # to push to gh-pages
+  contents: write
+  pages: write
 
 jobs:
   docs:
@@ -22,9 +20,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0    # full history, needed for gh-pages action
+          persist-credentials: true
 
-      - name: Setup Python 3.x
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
@@ -37,11 +35,7 @@ jobs:
 
       - name: Generate API stubs
         run: |
-          sphinx-apidoc \
-            --module-first \
-            --separate \
-            --output-dir docs/api \
-            src/video_processing_toolkit
+          sphinx-apidoc --module-first --separate --output-dir docs/api src/video_processing_toolkit
 
       - name: Build HTML documentation
         working-directory: docs
