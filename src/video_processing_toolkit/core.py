@@ -16,7 +16,7 @@ def get_frame_types(video_file):
     Args:
         video_file (str): Path to the input video file.
     Returns:
-        zip: A zip object containing tuples of (frame_index, frame_type),
+        Zip: A zip object containing tuples of (frame_index, frame_type),
              where frame_index is an integer and frame_type is a string ('I', 'P', 'B').
     """
     command = 'ffprobe -v error -show_entries frame=pict_type -of default=noprint_wrappers=1'.split()
@@ -225,7 +225,7 @@ def convert_video(inputed_file):
         inputed_file(str): Path of the input video file
 
     Returns:
-        video_name(str): The name of the output video file, which automatically takes the name from current time and save the
+        str: The name of the output video file, which automatically takes the name from current time and save the
         file into current project folder
     """
     current_time = time.strftime("%Y%m%d-%H%M%S")
