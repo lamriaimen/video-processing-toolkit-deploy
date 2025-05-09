@@ -270,7 +270,7 @@ def frames_to_video(input_path, output_path, fps):
         fps(int): The Frame rate of the created video stream
         output_path(str): The path where the constructed video will be saved.
     Returns:
-        None.
+        None
     """
     image_array = []
     files = [f for f in os.listdir(input_path) if os.path.isfile(os.path.join(input_path, f))]
@@ -298,7 +298,7 @@ def video_to_all_frames(input_loc, output_loc):
         input_loc (str): Path to the input video file
         output_loc (str): Directory where the frames will be saved.
     Returns:
-        None.
+        None
     """
     try:
         os.mkdir(output_loc)
@@ -339,6 +339,7 @@ def video_to_all_frames(input_loc, output_loc):
 def extract_images_regular_interval(path_in, path_out, time_interval_in_sec):
     """Function to extract the frames in every given "time_interval" e.g. 1 sec, 5 sec etc. from input video file
     and save them as separate frames in an output directory.
+    
     Args:
         path_in(str): Input video file
         path_out(str): Directory where the extracted frames will be saved
@@ -475,6 +476,7 @@ def extract_regular_interval_images_between_two_timestamps(path_in, path_out, hh
                                                            time_interval_in_sec):
     """Function to extract frames after given regular intervals within two timestamps; Need to know the number of
     frames per second and the start and end timestamp in the video.
+
     Args:
         path_in (str): Path to the input video file
         path_out (str): Directory where the extracted frames will be saved
