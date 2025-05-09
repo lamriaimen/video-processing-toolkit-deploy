@@ -552,3 +552,108 @@ def test_compute_frame_per_sec_rate_opencv_v2(mock_VideoCapture):
 
     mock_cap.get.assert_called_once_with(cv2.cv.CV_CAP_PROP_FPS)
     assert fps == 25
+
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def extract_regular_interval_images_between_two_timestamps_starts_at_correct_timestamp(mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30 
+
+    mock_cap.read.side_effect = [
+        (True, "frame_1"),
+        (True, "frame_2"),
+        (False, None)
+    ]
+
+    extract_regular_interval_images_between_two_timestamps(
+        "video.mp4", 
+        "output_dir", 
+        "00:00:05", 
+        "00:00:06",
+        1
+    )
+
+    mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_MSEC, 5000)
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_extract_regular_interval_images_between_two_timestamps(mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30  # 30 FPS
+
+    # Simulation des lectures de frames
+    mock_cap.read.side_effect = [
+        (True, "frame_1"),
+        (True, "frame_2"),
+        (True, "frame_3"),
+        (False, None)
+    ]
+
+    extract_regular_interval_images_between_two_timestamps(
+        "video.mp4", 
+        "output_dir", 
+        "00:00:05", 
+        "00:00:06",
+        1
+    )
+
+    expected_calls = [
+        (cv2.CAP_PROP_POS_MSEC, 5000), 
+        (cv2.CAP_PROP_POS_MSEC, 6000) 
+    ]
+
+    actual_calls = mock_cap.set.call_args_list
+    for call, expected in zip(actual_calls, expected_calls):
+        assert call[0] == expected
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_extract_regular_interval_images_between_two_timestamps_stops_at_last_timestamp(mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30  
+
+    mock_cap.read.side_effect = [
+        (True, "frame_1"),
+        (True, "frame_2"),
+        (True, "frame_3"),
+        (False, None)
+    ]
+
+    extract_regular_interval_images_between_two_timestamps(
+        "video.mp4", 
+        "output_dir", 
+        "00:00:05", 
+        "00:00:06",
+        1
+    )
+
+    calls = [call[0][1] for call in mock_cap.set.call_args_list]
+    assert all(time <= 6000 for time in calls)
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+def test_extract_regular_interval_images_between_two_timestamps_saves_only_valid_frames(mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+    mock_cap.get.return_value = 30  # 30 FPS
+
+    mock_cap.read.side_effect = [
+        (True, "frame_1"),
+        (True, "frame_2"),
+        (False, "frame_3"),
+        (False, None)
+    ]
+
+    extract_regular_interval_images_between_two_timestamps(
+        "video.mp4", 
+        "output_dir", 
+        "00:00:05", 
+        "00:00:06",
+        1
+    )
+
+    assert mock_imwrite.call_count == 2
