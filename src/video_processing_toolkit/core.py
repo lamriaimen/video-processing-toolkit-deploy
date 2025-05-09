@@ -237,12 +237,12 @@ def convert_video(inputed_file):
 
 
 def compute_frame_per_sec_rate(video_file: str) -> int:
-    """Function to compute the frame per seconds or pfs
-    
+    """Function to compute the frame per seconds or pfs.
+
     Args:
-        video_file (str): Path of the video file
+        video_file (str): Path of the video file.
     Returns:
-        int : The Frame rate of the created video stream
+        int : The Frame rate of the created video stream.
     """
     # Find OpenCV version
     (major_ver, minor_ver, subminor_ver) = cv2.__version__.split('.')
