@@ -289,9 +289,11 @@ def frames_to_video(input_path, output_path, fps):
 def video_to_all_frames(input_loc, output_loc):
     """Function to extract all the frames from input video file
     and save them as separate frames in an output directory.
+
     Args:
-        input_loc(str): Path to the input video file.
-        output_loc(str): Directory where the frames will be saved.
+        input_loc (str): Path to the input video file.
+        output_loc (str): Directory where the frames will be saved.
+
     Returns:
         None
     """
