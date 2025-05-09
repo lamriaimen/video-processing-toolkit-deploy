@@ -8,7 +8,7 @@ Welcome to Video Processing Toolkit's documentation!
    readme
    installation
    usage
-   modules
+   autoapi/index
    contributing
    authors
    history
