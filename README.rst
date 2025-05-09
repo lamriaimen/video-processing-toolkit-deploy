@@ -27,7 +27,7 @@ Video Processing Toolkit
 A Python toolkit for slicing, annotating, and processing video files for data analysis and machine learning.
 
 * Free software: MIT license
-* Documentation: https://video-processing-toolkit.readthedocs.io.
+* Documentation: https://loicsc1.github.io/video-processing-toolkit.
 
 Features
 --------
