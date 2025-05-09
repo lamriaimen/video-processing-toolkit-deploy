@@ -3,40 +3,19 @@
 
 import os
 import sys
-<<<<<<< HEAD
-sys.path.insert(0, os.path.abspath('../src'))
-=======
 import types
->>>>>>> 9f59c49 (Configure AutoAPI docs, update index.rst, and add Pages CI workflow)
 
 # -- Path setup --------------------------------------------------------------
 
-# Point Sphinx at your package source code
+# Add your package’s src directory to sys.path
 sys.path.insert(0, os.path.abspath('../src'))
 
-# Mock heavy or missing external dependencies so imports in your code won't fail
+# Mock heavy or missing external deps so Sphinx can import your code
 for _mod in ("cv2", "numpy", "torch", "ffmpy"):
     sys.modules[_mod] = types.ModuleType(_mod)
 
-<<<<<<< HEAD
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
-]
-# Automatically document members (functions, classes, etc.)
-autodoc_default_options = {
-    'members': True,
-    'undoc-members': False,    # set True if you also want undocumented members
-    'show-inheritance': True,
-}
-
-=======
-# Now it's safe to import your package
+# Now it’s safe to import your package
 import video_processing_toolkit  # noqa: E402
->>>>>>> 9f59c49 (Configure AutoAPI docs, update index.rst, and add Pages CI workflow)
 
 # -- Project information -----------------------------------------------------
 
