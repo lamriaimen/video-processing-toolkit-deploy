@@ -29,7 +29,7 @@ def save_all_i_keyframes(video_file, path_out):
     """Function to extract and save all I-frames of a complete video as image files.
     Args:
         video_file(str): Path to the input video file.
-        path_out(str): The output folder to save all the extracted frames.
+        path_out(str): Directory where the extracted frames will be saved.
     Returns: 
         None
     """
@@ -60,12 +60,12 @@ def save_all_i_keyframes(video_file, path_out):
 
 
 def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_start, hh_mm_ss_end):
-    """Function to extract and save all the all I-frames of a complete video as image files between two timestamps.
+    """Function to extract and save all the I-frames of a complete video as image files between two timestamps.
     Args:
         video_file(str): Path to the input video file.
-        path_out: The output folder to save all the output frames
-        hh_mm_ss_start: the time starting time stamp
-        hh_mm_ss_end: the time ending time stamp
+        path_out(str): The output folder to save all the output frames
+        hh_mm_ss_start(str): the time starting time stamp
+        hh_mm_ss_end(str): the time ending time stamp
     Returns:
         None
     """
@@ -126,7 +126,7 @@ def save_all_p_keyframes(video_file, path_out):
     """Function to extract all P-frames from a complete video as image files.
     Args:
         video_file(str): Path to the input video file.
-        path_out: The output folder to save all the output frames
+        path_out(str): Directory where the extracted frames will be saved.
 
     Returns:
         None
@@ -159,10 +159,10 @@ def save_all_p_keyframes(video_file, path_out):
 def save_all_p_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_start, hh_mm_ss_end):
     """Function to extract  and save all the p-key frames of a complete video
     Args:
-        video_file: Input video file.
-        path_out: The output folder to save all the output frames
-        hh_mm_ss_start: the time starting time stamp
-        hh_mm_ss_end: the time ending time stamp
+        video_file(str): Path to the input video file.
+        path_out(str): Directory where the extracted frames will be saved.
+        hh_mm_ss_start(str): the time starting time stamp
+        hh_mm_ss_end(str): the time ending time stamp
     Returns:
         None
     """
@@ -222,10 +222,10 @@ def save_all_p_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
 def convert_video(inputed_file):
     """Function to convert the video file into .avi format and save it into current project directory
     Args:
-        inputed_file: Path of the input video file
+        inputed_file(str): Path of the input video file
 
     Returns:
-        video_name: The name of the output video file, which automatically takes the name from current time and save the
+        video_name(str): The name of the output video file, which automatically takes the name from current time and save the
         file into current project folder
     """
     current_time = time.strftime("%Y%m%d-%H%M%S")
@@ -239,10 +239,10 @@ def convert_video(inputed_file):
 def compute_frame_per_sec_rate(video_file):
     """Function to compute the frame per seconds or pfs
     Args:
-        video_file: Path of the video file
+        video_file(str): Path of the video file
 
     Returns:
-        fps: The Frame rate of the created video stream
+        fps(int): The Frame rate of the created video stream
     """
     # Find OpenCV version
     (major_ver, minor_ver, subminor_ver) = cv2.__version__.split('.')
@@ -261,9 +261,9 @@ def compute_frame_per_sec_rate(video_file):
 def frames_to_video(input_path, output_path, fps):
     """Function reads all the individual frames, saved in a directory and then use them to create a video
     Args:
-        input_path: Path of the directory where the images or frames are saved
-        fps: The Frame rate of the created video stream.
-        output_path: The path where the constructed video will be saved
+        input_path(str): Path of the directory where the images or frames are saved
+        fps(int): The Frame rate of the created video stream.
+        output_path(str): The path where the constructed video will be saved
     Returns:
         None
     """
@@ -290,8 +290,8 @@ def video_to_all_frames(input_loc, output_loc):
     """Function to extract all the frames from input video file
     and save them as separate frames in an output directory.
     Args:
-        input_loc: Input video file.
-        output_loc: Output directory to save the frames.
+        input_loc(str): Path to the input video file.
+        output_loc(str): Directory where the frames will be saved.
     Returns:
         None
     """
@@ -335,9 +335,10 @@ def extract_images_regular_interval(path_in, path_out, time_interval_in_sec):
     """Function to extract the frames in every given "time_interval" e.g. 1 sec, 5 sec etc. from input video file
     and save them as separate frames in an output directory.
     Args:
-        path_in: Input video file.
-        time_interval_in_sec: the time interval of the sampling, mention in seconds; we convert it into milliseconds
-        path_out: Output directory to save the frames.
+        path_in(str): Input video file.
+        path_out(str): Directory where the extracted frames will be saved.
+        time_interval_in_sec(int): the time interval of the sampling, mention in seconds; we convert it into milliseconds
+        
     Returns:
         None
     Resources:
@@ -367,9 +368,10 @@ def extract_images_at_particular_timestamp(path_in, path_out, hh_mm_ss):
     """Function to extract the frame at a particular time stamp; Need to know the number of frames per second and the
     timestamp in the video , we want to take frame from, we can easily calculate the frame number we want
     Args:
-        path_in: Input video file.
-        hh_mm_ss: the time
-        path_out: Output directory to save the frames.
+        path_in(str): Input video file.
+        path_out (str): Directory where the extracted frame will be saved.
+        hh_mm_ss(str): The timestamp in "HH:MM:SS" format where the frame should be extracted.
+        
     Returns:
         None
     """
@@ -409,10 +411,11 @@ def extract_images_between_two_timestamps(path_in, path_out, hh_mm_ss_start, hh_
     """Function to extract all the frames within two timestamps; Need to know the number of frames per second and the
     start and end timestamp in the video
     Args:
-        path_in: Input video file.
-        hh_mm_ss_start: the time starting time stamp
-        hh_mm_ss_end: the time ending time stamp
-        path_out: Output directory to save the frames.
+        path_in(str): Path to the input video file.
+        path_out(str): Directory where the extracted frames will be saved.
+        hh_mm_ss_start (str): The start timestamp in "HH:MM:SS" format.
+        hh_mm_ss_end (str): The end timestamp in "HH:MM:SS" format.
+        
 
     Returns:
         None
@@ -470,11 +473,11 @@ def extract_regular_interval_images_between_two_timestamps(path_in, path_out, hh
     """Function to extract frames after given regular intervals within two timestamps; Need to know the number of
     frames per second and the start and end timestamp in the video
     Args:
-        path_in: Input video file.
-        hh_mm_ss_start: the time starting time stamp
-        hh_mm_ss_end: the time ending time stamp
-        time_interval_in_sec: The regular time interval
-        path_out: Output directory to save the frames.
+        path_in (str): Path to the input video file.
+        path_out (str): Directory where the extracted frames will be saved.
+        hh_mm_ss_start (str): The start timestamp in "HH:MM:SS" format.
+        hh_mm_ss_end (str): The end timestamp in "HH:MM:SS" format.
+        time_interval_in_sec (int): The time interval (in seconds) between each frame extraction.
     Returns:
         None
     """
