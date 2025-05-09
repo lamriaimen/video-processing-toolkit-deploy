@@ -552,6 +552,72 @@ def test_extract_images_regular_interval_releases_video(mock_imwrite, mock_Video
     mock_cap.release.assert_called_once()
 
 # ------------------------------------------------
+# TESTS for the function `extract_images_at_particular_timestamp`
+# ------------------------------------------------
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.compute_frame_per_sec_rate")
+def test_extract_images_at_particular_timestamp_starts_at_correct_timestamp(mock_compute_fps, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+
+    mock_compute_fps.return_value = 30
+    mock_cap.read.return_value = (True, "frame_image")
+
+    extract_images_at_particular_timestamp("video.mp4", "output_dir", "00:00:05")
+
+    mock_cap.set.assert_called_once_with(cv2.CAP_PROP_POS_MSEC, 5000)
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.compute_frame_per_sec_rate")
+def test_extract_images_at_particular_timestamp_saves_correctly(mock_compute_fps, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+
+    mock_compute_fps.return_value = 30
+    mock_cap.read.return_value = (True, "frame_image")
+
+    extract_images_at_particular_timestamp("video.mp4", "output_dir", "00:00:05")
+
+    mock_imwrite.assert_called_once_with("output_dir/%#05d.jpg" % 150, "frame_image")
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.compute_frame_per_sec_rate")
+def test_extract_images_at_particular_timestamp_releases_video_capture(mock_compute_fps, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+
+    mock_compute_fps.return_value = 30
+    mock_cap.read.return_value = (True, "frame_image")
+
+    extract_images_at_particular_timestamp("video.mp4", "output_dir", "00:00:05")
+
+    mock_cap.release.assert_called_once()
+
+@patch("video_processing_toolkit.core.cv2.VideoCapture")
+@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.core.compute_frame_per_sec_rate")
+def test_extract_images_at_particular_timestamp_only_image_at_5_seconds(mock_compute_fps, mock_imwrite, mock_VideoCapture):
+    mock_cap = MagicMock()
+    mock_VideoCapture.return_value = mock_cap
+
+    mock_compute_fps.return_value = 30
+    mock_cap.read.side_effect = [
+        (True, "frame_1"),
+        (False, None) 
+    ]
+
+    extract_images_at_particular_timestamp("video.mp4", "output_dir", "00:00:05")
+
+    mock_cap.set.assert_called_once_with(cv2.CAP_PROP_POS_MSEC, 5000)
+
+    mock_imwrite.assert_called_once_with("output_dir/%#05d.jpg" % 150, "frame_1")
+    
+    assert len(mock_cap.set.call_args_list) == 1
+
+# ------------------------------------------------
 # TESTS for the function `extract_images_between_two_timestamps`
 # ------------------------------------------------
 @patch("video_processing_toolkit.core.cv2.VideoCapture")
