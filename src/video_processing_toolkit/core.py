@@ -516,12 +516,15 @@ def extract_regular_interval_images_between_two_timestamps(path_in, path_out, hh
 
         frame_pointer = time_in_millisec_start + (blank_cnt * time_interval_in_millisec)
 
+        if frame_pointer > (time_in_sec_end * 1000):
+            break
         # setting the pointer to read from this time stamp
         vidcap.set(cv2.CAP_PROP_POS_MSEC, frame_pointer)
         # Extract the frames
         success, frame = vidcap.read()
         if not success:
             continue
+
         print('Read a new frame: ', success)
         cv2.imwrite(path_out + "/%#05d.jpg" % count, frame)  # save frame as JPEG file
 
