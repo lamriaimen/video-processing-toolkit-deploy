@@ -544,35 +544,3 @@ def extract_regular_interval_images_between_two_timestamps(path_in, path_out, hh
     vidcap.release()  # Release the feed
     print("Done extracting frames.\n%d frames extracted" % count)
     # break
-
-
-def main():
-    print("This is only a test")
-    input_loc = '/home/tanmoymondal/Videos/FootBall_Video_Data/669/clips/0_37_56-0_52_0.mp4'
-    output_loc_1 = '/home/tanmoymondal/Videos/FootBall_Video_Data/669/clips/save_all_frames/'
-
-    output_loc_2 = '/home/tanmoymondal/Videos/FootBall_Video_Data/669/clips/save_frames_regular_time_interval/'
-    output_loc_3 = '/home/tanmoymondal/Videos/FootBall_Video_Data/669/clips/save_image_particular_timestamp/'
-    output_loc_4 = "/home/tanmoymondal/Videos/FootBall_Video_Data/669/clips/save_frames_between_timestamps/"
-    output_loc_5 = "/home/tanmoymondal/Videos/FootBall_Video_Data/669/clips/save_frames_bet_tstamps_regular_interval/"
-    output_loc_6 = "/home/tanmoymondal/Videos/FootBall_Video_Data/669/clips/save_all_i_frames/"
-    output_loc_7 = "/home/tanmoymondal/Videos/FootBall_Video_Data/669/clips/save_all_p_frames/"
-
-    # video_to_all_frames(input_loc, output_loc_1)  # WORKING
-    # extract_images_regular_interval(input_loc, output_loc_2, 5)  # WORKING
-    # extract_images_at_particular_timestamp(input_loc, output_loc_3, "00:09:40")  # WORKING
-    # extract_images_between_two_timestamps(input_loc, output_loc_4, "00:05:30", "00:09:40")  # WORKING
-    # extract_regular_interval_images_between_two_timestamps(input_loc, output_loc_5, "00:05:30", "00:09:40", 5)
-    # frames_to_video(input_loc, output_loc)
-
-    # save_all_i_keyframes(input_loc, output_loc_6)
-    save_all_i_keyframes_between_two_timestamps(input_loc, output_loc_6, "00:05:30", "00:09:40")
-
-    # save_all_p_keyframes(input_loc, output_loc_7)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='PyTorch Template')
-
-    args = parser.parse_args()
-    main()
