@@ -22,35 +22,36 @@ from PIL import Image as PILImage
 class VideoOperation:
 
     def __init__(self):
-        print(" I am inside init function of test file ")
+        print(" Video Operation class ")
 
     @staticmethod
     def get_clip(input_filename, output_filename, start_time, end_time):
         """
-        Function to actually cut the video clips
+        Function to actually cut the video clips.
+
         Args:
             input_filename: Path of the input video file
             output_filename: The path of the output file clip
             start_time: The start time stamp
-            end_time: The end time stamp
+            end_time: The end time stamp.
         Returns:
-
+            None
         """
         ffmpeg_extract_subclip(input_filename, start_time, end_time, targetname=output_filename)
 
     @staticmethod
     def cut_video_clips(input_filename, output_file_path, time_stamp_start_1, time_stamp_end_1):
-
         """
         Function to read several start and end time stamps, mentioned in two vectors; "time_stamp_start_1" and
-        "time_stamp_end_1", to crop the video clips based on these start and end time stamps
+        "time_stamp_end_1", to crop the video clips based on these start and end time stamps.
+
         Args:
             input_filename: Path of the input video file
             output_file_path: The path of the output file clip
             time_stamp_start_1 : The list of start time in HH:MM:SS format
-            time_stamp_end_1 : The list of end time in HH:MM:SS format
+            time_stamp_end_1 : The list of end time in HH:MM:SS format.
         Returns:
-
+            None
         """
         for ii in range(0, len(time_stamp_start_1)):
             get_clip_start_time = time_stamp_start_1[ii]
@@ -79,7 +80,16 @@ class VideoOperation:
 
     @staticmethod
     def handlle_nils_field_segmentation(frame):
+        """
+        Performs field segmentation on the given image frame, applying a color-based mask
+        to isolate regions with specific hue values, typically representing green field areas.
 
+        Args:
+            frame (np.ndarray): The input image as a NumPy array in BGR color format.
+        Returns:
+            np.ndarray: A NumPy array representing the masked image where only the segmented
+                    field regions are preserved, and the rest is filtered out.
+        """
         segmentation_node = FieldSegmentation()
         segmentation_node.border_size.value = 0
         segmentation_node.blur_size.value = 0
@@ -103,20 +113,16 @@ class VideoOperation:
 
     @staticmethod
     def process_input_video_give_video_output(input_loc, output_loc, function_to_apply):
-        """Function to apply the processing on each frames from input video file
-        and create another video
+        """Function to apply the processing on each frames from input video file and create another video.
+
         Args:
-            input_loc: Input video file.
+            input_loc: Input video file
             output_loc: The path of output video file
-
             function_to_apply : The function in which the processing will be applied. Remember, this function should
-            take opencv frame i.e. a numpy array (nd.array) as the input and will return the same i.e. a numpy array
-
+            take opencv frame i.e. a numpy array (nd.array) as the input and will return the same i.e. a numpy array.
         Example usage :
             process_input_video_give_video_output("input_video_path", "output_video_path",
             handlle_nils_field_segmentation)
-
-
         Returns:
             None
         """
