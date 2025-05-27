@@ -3,10 +3,23 @@ import numpy as np
 
 def region_to_bbox(region, center=True):
     """
-    Transforms the ground-truth annotation to the convenient format. The
-    annotations come in different formats depending on the dataset of origin
-    (see README, --Dataset--, for details), some use 4 numbers and some use 8
-    numbers to describe the bounding boxes.
+    Converts a ground-truth region annotation to a standard bounding box format.
+
+    The input region can be in one of two formats:
+    - 4 values: [x, y, width, height] — axis-aligned bounding box.
+    - 8 values: [x1, y1, x2, y2, x3, y3, x4, y4] — rotated bounding box defined by corner points.
+
+    This function normalizes both formats to the standard form (cx, cy, w, h), where:
+    - cx, cy = center coordinates of the box
+    - w, h   = width and height of the box
+
+    Args:
+        region (list or np.ndarray): List of 4 or 8 numbers describing the bounding box.
+        center (bool): If True, returns (cx, cy, w, h). If False, returns (x, y, w, h),
+                       where (x, y) is the top-left corner.
+
+    Returns:
+        tuple: Bounding box in the desired format.
     """
     n = len(region)
     assert n in [4, 8], 'GT region format is invalid, should have 4 or 8 entries.'
@@ -19,12 +32,19 @@ def region_to_bbox(region, center=True):
 
 def rect(region, center):
     """
-    Calculate the center if center=True, otherwise the 4 number annotations
-    used in the TempleColor and VOT13 datasets are already in the correct
-    format.
-    (cx, cy) is the center and w, h are the width and height of the target
-    When center is False it returns region, which is a 4 tuple containing the
-    (x, y) coordinates of the LowerLeft corner and its width and height.
+    Processes a 4-value axis-aligned bounding box.
+
+    If center=True, converts the format from (x, y, w, h) to (cx, cy, w, h),
+    where (x, y) is the top-left corner, and (cx, cy) is the center.
+
+    If center=False, returns the original (x, y, w, h).
+
+    Args:
+        region (list or np.ndarray): List of 4 values [x, y, width, height].
+        center (bool): Whether to convert to center-based format.
+
+    Returns:
+        tuple: Bounding box in the chosen format.
     """
     if center:
         x = region[0]
@@ -40,13 +60,20 @@ def rect(region, center):
 
 def poly(region, center):
     """
-    Calculates the center, width and height of the bounding box when the
-    annotations are 8 number rotated bounding boxes (used in VOT14 and VOT16).
-    Since the Tracker does not try to estimate the rotation of the target, this
-    function returns a upright bounding box with the same center width and
-    height of the original one.
-    The 8 numbers correspond to the (x,y) coordinates of the each of the 4
-    corner points of the bounding box.
+    Processes an 8-value rotated bounding box defined by its four corners.
+
+    Calculates an axis-aligned bounding box that approximates the rotated one,
+    preserving its center and approximate area. This is useful when the tracking
+    algorithm does not support rotated boxes.
+
+    Args:
+        region (list or np.ndarray): List of 8 values representing the (x, y) coordinates
+                                     of the four corners of the box, in order.
+        center (bool): If True, returns (cx, cy, w, h). Otherwise, returns (x, y, w, h)
+                       where (x, y) is the top-left corner of the axis-aligned box.
+
+    Returns:
+        tuple: Bounding box approximating the original rotated box.
     """
     cx = np.mean(region[::2])
     cy = np.mean(region[1::2])
