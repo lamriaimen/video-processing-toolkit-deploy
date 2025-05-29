@@ -41,13 +41,20 @@ def save_all_i_keyframes(video_file, path_out):
     if i_frames:
         # basename = os.path.splitext(os.path.basename(video_file))[0]
         cap = cv2.VideoCapture(video_file)
+        fps = cap.get(cv2.CAP_PROP_FPS)
 
         blank_cnt = 0
         for frame_no in i_frames:
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
             ret, frame = cap.read()
 
-            create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
+            timestamp_sec = frame_no / fps
+            hh = int(timestamp_sec // 3600)
+            mm = int((timestamp_sec % 3600) // 60)
+            ss = int(timestamp_sec % 60)
+            timestamp_str = f"{hh:02d}{mm:02d}{ss:02d}"
+
+            create_img_name = f"/frame_{timestamp_str}.jpg"
 
             full_frame_saving_path = path_out + create_img_name
             cv2.imwrite(full_frame_saving_path, frame)
@@ -111,7 +118,14 @@ def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
                 ret, frame = cap.read()
 
-                create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
+
+                timestamp_sec = frame_no / fps
+                hh = int(timestamp_sec // 3600)
+                mm = int((timestamp_sec % 3600) // 60)
+                ss = int(timestamp_sec % 60)
+                timestamp_str = f"{hh:02d}{mm:02d}{ss:02d}"
+                create_img_name = f"frame_{timestamp_str}.jpg"
+                #create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
 
                 full_frame_saving_path = path_out + "/" + create_img_name
                 cv2.imwrite(full_frame_saving_path, frame)
@@ -139,13 +153,20 @@ def save_all_p_keyframes(video_file, path_out):
     if i_frames:
         # basename = os.path.splitext(os.path.basename(video_file))[0]
         cap = cv2.VideoCapture(video_file)
+        fps = int(cap.get(cv2.CAP_PROP_FPS))
 
         blank_cnt = 0
         for frame_no in i_frames:
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
             ret, frame = cap.read()
 
-            create_img_name = "/" + str(blank_cnt) +"frame_" + str(frame_no) + ".jpg"
+            timestamp_sec = frame_no / fps
+            hh = int(timestamp_sec // 3600)
+            mm = int((timestamp_sec % 3600) // 60)
+            ss = int(timestamp_sec % 60)
+            timestamp_str = f"{hh:02d}{mm:02d}{ss:02d}"
+            create_img_name = f"frame_{timestamp_str}.jpg"
+            # create_img_name = "/" + str(blank_cnt) +"frame_" + str(frame_no) + ".jpg"
 
             full_frame_saving_path = path_out + "/" + create_img_name
             cv2.imwrite(full_frame_saving_path, frame)
@@ -209,7 +230,13 @@ def save_all_p_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
                 ret, frame = cap.read()
 
-                create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
+                timestamp_sec = frame_no / fps
+                hh = int(timestamp_sec // 3600)
+                mm = int((timestamp_sec % 3600) // 60)
+                ss = int(timestamp_sec % 60)
+                timestamp_str = f"{hh:02d}{mm:02d}{ss:02d}"
+                create_img_name = f"frame_{timestamp_str}.jpg"
+                # create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
 
                 full_frame_saving_path = path_out + "/" + create_img_name
                 cv2.imwrite(full_frame_saving_path, frame)
