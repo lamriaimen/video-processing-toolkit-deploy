@@ -6,8 +6,9 @@ from pathlib import Path
 import pytest
 from unittest.mock import patch
 import shutil
-
+import math
 from src.video_processing_toolkit import *
+import cv2
 
 def test_save_all_i_keyframes_not_empty(tmp_path):
     video_path = "tests/video_test.mp4"
@@ -40,14 +41,26 @@ def test_save_all_i_keyframes_gets_only_iframes(tmp_path):
 
     output_files = list(output_dir.iterdir())
 
-    frame_numbers = [
-        int(f.name.split("frame_")[1].split(".")[0])
-        for f in output_files
-    ]
+    cap = cv2.VideoCapture(video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    cap.release()
 
     frame_types = dict(get_frame_types(video_path))
 
-    assert all(frame_types[num] == 'I' for num in frame_numbers)    
+    i_frame_timestamps = set(
+        math.floor(frame_no / fps)
+        for frame_no, frame_type in frame_types.items()
+        if frame_type == 'I'
+    )
+
+    for f in output_files:
+        ts = f.stem.split("frame_")[1]
+        hh = int(ts[0:2])
+        mm = int(ts[2:4])
+        ss = int(ts[4:6])
+        total_seconds = hh * 3600 + mm * 60 + ss
+
+        assert total_seconds in i_frame_timestamps, f"{f.name} is not from an I-frame"
 
 def test_save_all_p_keyframes_not_empty(tmp_path):
     video_path = "tests/video_test.mp4"
@@ -70,21 +83,34 @@ def test_save_all_p_keyframes_creates_jpg_files(tmp_path):
     assert all(f.suffix.lower() == ".jpg" for f in output_files)
     
 def test_save_all_p_keyframes_gets_only_pframes(tmp_path):
+
     video_path = "tests/video_test.mp4"
     output_dir = tmp_path
 
     save_all_p_keyframes(video_path, str(output_dir))
-
     output_files = list(output_dir.iterdir())
 
-    frame_numbers = [
-        int(f.name.split("frame_")[1].split(".")[0])
-        for f in output_files
-    ]
+    cap = cv2.VideoCapture(video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    cap.release()
 
     frame_types = dict(get_frame_types(video_path))
 
-    assert all(frame_types[num] == 'P' for num in frame_numbers)
+    p_frame_timestamps = set(
+        math.floor(frame_no / fps)
+        for frame_no, frame_type in frame_types.items()
+        if frame_type == 'P'
+    )
+
+    for f in output_files:
+        ts = f.stem.split("frame_")[1]
+        hh = int(ts[0:2])
+        mm = int(ts[2:4])
+        ss = int(ts[4:6])
+        total_seconds = hh * 3600 + mm * 60 + ss
+
+        assert total_seconds in p_frame_timestamps, f"{f.name} is not from a P-frame"
+
 
 def test_all_i_keyframes_between_two_timestamps_not_empty_and_correct(tmp_path):
     video_path = "tests/video_test.mp4"
@@ -117,58 +143,62 @@ def test_all_i_keyframes_between_two_timestamps_not_empty_and_correct(tmp_path):
         assert img.shape[0] > 0 and img.shape[1] > 0, f"Image vide ou corrompue: {img_file}"
     
     for img_file in output_files:
-        file_name = img_file.name
-        assert "frame_" in file_name
-    
-    first_frame_idx = int(4 * fps)
-    last_frame_idx = int(15 * fps)
-    
-    for img_file in output_files:
+        assert "frame_" in img_file.name
 
-        frame_num = int(img_file.stem.split('frame_')[1])
-        assert first_frame_idx <= frame_num <= last_frame_idx
+    start_sec = 5
+    end_sec = 15
+
+    for img_file in output_files:
+        ts = img_file.stem.split("frame_")[1]
+        hh = int(ts[0:2])
+        mm = int(ts[2:4])
+        ss = int(ts[4:6])
+        total_seconds = hh * 3600 + mm * 60 + ss
+
+        assert start_sec <= total_seconds <= end_sec
 
 def test_all_p_keyframes_between_two_timestamps_not_empty_and_correct(tmp_path):
     video_path = "tests/video_test.mp4"
     output_dir = tmp_path
-    
+
     start_time = "00:00:05"
     end_time = "00:00:15"
-    
+
     cap = cv2.VideoCapture(video_path)
-        
     fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     cap.release()
-    
+
     assert fps > 0, "Le FPS de la vidéo doit être supérieur à 0"
-    
+
     save_all_p_keyframes_between_two_timestamps(video_path, str(output_dir), start_time, end_time)
-    
+
     output_files = list(output_dir.iterdir())
-    
-    assert len(output_files) > 0, "Aucun I-frame n'a été extrait"
- 
+
+    assert len(output_files) > 0, "Aucun P-frame n'a été extrait"
+
     max_expected_frames = int(fps * 10)
     assert len(output_files) <= max_expected_frames
-    
+
     for img_file in output_files:
         assert img_file.suffix.lower() in ['.jpg', '.jpeg', '.png']
         img = cv2.imread(str(img_file))
         assert img is not None
         assert img.shape[0] > 0 and img.shape[1] > 0, f"Image vide ou corrompue: {img_file}"
-    
-    for img_file in output_files:
-        file_name = img_file.name
-        assert "frame_" in file_name
-    
-    first_frame_idx = int(4 * fps)
-    last_frame_idx = int(15 * fps)
-    
-    for img_file in output_files:
 
-        frame_num = int(img_file.stem.split('frame_')[1])
-        assert first_frame_idx <= frame_num <= last_frame_idx
+    for img_file in output_files:
+        assert "frame_" in img_file.name
+
+    start_sec = 4
+    end_sec = 15
+
+    for img_file in output_files:
+        ts = img_file.stem.split("frame_")[1]
+        hh = int(ts[0:2])
+        mm = int(ts[2:4])
+        ss = int(ts[4:6])
+        total_seconds = hh * 3600 + mm * 60 + ss
+
+        assert start_sec <= total_seconds <= end_sec
 
 
 def test_convert_video(tmp_path):
