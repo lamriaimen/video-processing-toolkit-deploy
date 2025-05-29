@@ -56,7 +56,7 @@ def save_all_i_keyframes(video_file, path_out):
             ss = int(timestamp_sec % 60)
             timestamp_str = f"{hh:02d}{mm:02d}{ss:02d}"
 
-            create_img_name = f"/frame_{timestamp_str}.jpg"
+            create_img_name = f"frame_{timestamp_str}.jpg"
 
             full_frame_saving_path = os.path.join(path_out, create_img_name)
             cv2.imwrite(full_frame_saving_path, frame)
