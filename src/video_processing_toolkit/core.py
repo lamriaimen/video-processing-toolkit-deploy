@@ -35,6 +35,8 @@ def save_all_i_keyframes(video_file, path_out):
     Returns: 
         None
     """
+    os.makedirs(path_out, exist_ok=True)
+
     frame_types = get_frame_types(video_file)
     i_frames = [x[0] for x in frame_types if x[1] == 'I']
 
@@ -56,7 +58,7 @@ def save_all_i_keyframes(video_file, path_out):
 
             create_img_name = f"/frame_{timestamp_str}.jpg"
 
-            full_frame_saving_path = path_out + create_img_name
+            full_frame_saving_path = os.path.join(path_out, create_img_name)
             cv2.imwrite(full_frame_saving_path, frame)
 
             print('Saved: ' + full_frame_saving_path)
@@ -79,7 +81,7 @@ def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
     Returns:
         None
     """
-    # basename = os.path.splitext(os.path.basename(video_file))[0]
+    os.makedirs(path_out, exist_ok=True)
     cap = cv2.VideoCapture(video_file)
 
     time_data_split_start = hh_mm_ss_start.split(":")
@@ -127,7 +129,7 @@ def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
                 create_img_name = f"frame_{timestamp_str}.jpg"
                 #create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
 
-                full_frame_saving_path = path_out + "/" + create_img_name
+                full_frame_saving_path = os.path.join(path_out, create_img_name)
                 cv2.imwrite(full_frame_saving_path, frame)
 
                 # print('Saved: ' + full_frame_saving_path)
@@ -148,10 +150,10 @@ def save_all_p_keyframes(video_file, path_out):
     Returns:
         None
     """
+    os.makedirs(path_out, exist_ok=True)
     frame_types = get_frame_types(video_file)
     i_frames = [x[0] for x in frame_types if x[1] == 'P']
     if i_frames:
-        # basename = os.path.splitext(os.path.basename(video_file))[0]
         cap = cv2.VideoCapture(video_file)
         fps = int(cap.get(cv2.CAP_PROP_FPS))
 
@@ -166,12 +168,11 @@ def save_all_p_keyframes(video_file, path_out):
             ss = int(timestamp_sec % 60)
             timestamp_str = f"{hh:02d}{mm:02d}{ss:02d}"
             create_img_name = f"frame_{timestamp_str}.jpg"
-            # create_img_name = "/" + str(blank_cnt) +"frame_" + str(frame_no) + ".jpg"
 
-            full_frame_saving_path = path_out + "/" + create_img_name
+            full_frame_saving_path = os.path.join(path_out, create_img_name)
             cv2.imwrite(full_frame_saving_path, frame)
 
-            # print('Saved: ' + full_frame_saving_path)
+            print('Saved: ' + full_frame_saving_path)
 
             blank_cnt = blank_cnt + 1
         cap.release()
@@ -191,7 +192,7 @@ def save_all_p_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
     Returns:
         None
     """
-    # basename = os.path.splitext(os.path.basename(video_file))[0]
+    os.makedirs(path_out, exist_ok=True)
     cap = cv2.VideoCapture(video_file)
 
     time_data_split_start = hh_mm_ss_start.split(":")
@@ -236,12 +237,11 @@ def save_all_p_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
                 ss = int(timestamp_sec % 60)
                 timestamp_str = f"{hh:02d}{mm:02d}{ss:02d}"
                 create_img_name = f"frame_{timestamp_str}.jpg"
-                # create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
 
-                full_frame_saving_path = path_out + "/" + create_img_name
+                full_frame_saving_path = os.path.join(path_out, create_img_name)
                 cv2.imwrite(full_frame_saving_path, frame)
 
-                # print('Saved: ' + full_frame_saving_path)
+                print('Saved: ' + full_frame_saving_path)
 
                 blank_cnt = blank_cnt + 1
         cap.release()
