@@ -12,7 +12,7 @@ def get_clip(input_filename, output_filename, start_time, end_time):
         Returns:
             None
         """
-        ffmpeg_extract_subclip(input_filename, start_time, end_time, targetname=output_filename)
+        ffmpeg_extract_subclip(input_filename, start_time, end_time, output_filename)
 
 def cut_video_clips(input_filename, output_file_path, time_stamp_start_1, time_stamp_end_1):
         """
