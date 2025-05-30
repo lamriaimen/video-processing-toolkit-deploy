@@ -1,18 +1,27 @@
-from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+import subprocess
 
 def get_clip(input_filename, output_filename, start_time, end_time):
-        """
-        Function to actually cut the video clips.
+    """
+    Cuts a video using ffmpeg with re-encoding to ensure clean playback.
 
-        Args:
-            input_filename: Path of the input video file
-            output_filename: The path of the output file clip
-            start_time: The start time stamp
-            end_time: The end time stamp.
-        Returns:
-            None
-        """
-        ffmpeg_extract_subclip(input_filename, start_time, end_time, output_filename)
+    Args:
+        input_filename (str): Path to the input video.
+        output_filename (str): Path to save the output video.
+        start_time (float): Start time in seconds.
+        end_time (float): End time in seconds.
+    """
+    command = [
+        "ffmpeg",
+        "-y",  # Overwrite without asking
+        "-ss", str(start_time),
+        "-to", str(end_time),
+        "-i", input_filename,
+        "-c:v", "libx264",
+        "-c:a", "aac",
+        "-strict", "experimental",
+        output_filename
+    ]
+    subprocess.run(command, check=True)
 
 def cut_video_clips(input_filename, output_file_path, time_stamp_start_1, time_stamp_end_1):
         """
