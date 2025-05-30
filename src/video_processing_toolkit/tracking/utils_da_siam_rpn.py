@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import cv2
-from convert_file_format import ConvertFileFormat
+from video_processing_toolkit.transforms.convert_file_format import ConvertFileFormat
 
 
 class UtilsDaSiamRPN:
