@@ -571,3 +571,83 @@ def extract_regular_interval_images_between_two_timestamps(path_in, path_out, hh
     vidcap.release()  # Release the feed
     print("Done extracting frames.\n%d frames extracted" % count)
     # break
+
+def process_input_video_give_video_output(input_loc, output_loc, function_to_apply):
+        """Function to apply the processing on each frames from input video file and create another video.
+
+        Args:
+            input_loc: Input video file
+            output_loc: The path of output video file
+            function_to_apply : The function in which the processing will be applied. Remember, this function should
+            take opencv frame i.e. a numpy array (nd.array) as the input and will return the same i.e. a numpy array.
+        Example usage :
+            process_input_video_give_video_output("input_video_path", "output_video_path",
+            handlle_nils_field_segmentation)
+        Returns:
+            None
+        """
+
+        vidcap = cv2.VideoCapture(input_loc)  # read the video
+        get_fps = VideoOperation.compute_frame_per_sec_rate(vidcap)
+
+        # Log the time
+        time_start = time.time()
+
+        # Start capturing the feed
+        cap = cv2.VideoCapture(input_loc)
+
+        # Find the number of frames
+        video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
+        print("Number of frames: ", video_length)
+        count = 0
+        print("Converting video..\n")
+
+        # Just to get the size of image frames
+        size = (0, 0)
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                continue
+            else:
+                size = (frame.shape[1], frame.shape[0])
+                # cap.release()  # Release the feed
+                break
+
+        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+        out = cv2.VideoWriter(output_loc, fourcc, get_fps, size)
+
+        # Start converting the video
+        while cap.isOpened():
+            # Extract the frame
+            ret, frame = cap.read()
+            if not ret:
+                print("Done processing the BAD frame %d" % count)
+
+                if count > (video_length - 1):
+                    time_end = time.time()  # Log the time again
+                    cap.release()  # Release the feed
+
+                    print("It took %d seconds for conversion and last frame was BAD" % (time_end - time_start))
+                    break
+                count = count + 1
+                continue
+
+            # get_mask_2 = ColorProcessing.compute_field_mask_cvprw_2018(frame, "threshold_approximation")
+            # masked_2 = cv2.bitwise_and(frame, frame, mask=get_mask_2)
+
+            masked_2 = function_to_apply(frame)
+            out.write(masked_2)
+            print("Done processing the GOOD frame %d" % count)
+
+            count = count + 1
+
+            # If there are no more frames left
+            if count > (video_length - 1):
+                time_end = time.time()  # Log the time again
+                cap.release()  # Release the feed
+
+                print("Done extracting frames.\n%d frames extracted" % count)
+                print("It took %d seconds for conversion." % (time_end - time_start))
+                break
+
+        out.release()
