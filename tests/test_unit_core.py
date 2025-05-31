@@ -40,9 +40,9 @@ def test_get_frame_types_fails_when_invalid_video(mock_check_output):
 # ------------------------------------------------
 # TESTS for the function `save_all_i_keyframes`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.get_frame_types")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_save_all_i_keyframes_creates_correct_number_of_images(mock_imwrite, mock_VideoCapture, mock_get_frame_types, tmp_path):
     mock_get_frame_types.return_value = [(0, 'I'), (1, 'B'), (5, 'I'), (10, 'I'), (12, 'P')]
 
@@ -54,9 +54,9 @@ def test_save_all_i_keyframes_creates_correct_number_of_images(mock_imwrite, moc
 
     assert mock_imwrite.call_count == 3
 
-@patch("video_processing_toolkit.core.get_frame_types")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_save_all_i_keyframes_with_no_iframes(mock_imwrite, mock_VideoCapture, mock_get_frame_types, tmp_path):
     mock_get_frame_types.return_value = [(0, 'P'), (1, 'B'), (2, 'P')]
 
@@ -68,9 +68,9 @@ def test_save_all_i_keyframes_with_no_iframes(mock_imwrite, mock_VideoCapture, m
 
     mock_imwrite.assert_not_called()
 
-@patch("video_processing_toolkit.core.get_frame_types")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_save_all_i_keyframes_creates_correct_number_of_images(mock_imwrite, mock_VideoCapture, mock_get_frame_types, tmp_path):
     mock_get_frame_types.return_value = [(0, 'P'), (1, 'I'), (5, 'I'), (10, 'P'), (12, 'I')]
 
@@ -85,9 +85,9 @@ def test_save_all_i_keyframes_creates_correct_number_of_images(mock_imwrite, moc
 # ------------------------------------------------
 # TESTS for the function `save_all_i_keyframes_between_two_timestamps`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
 def test_save_all_i_keyframes_between_two_timestamps_starts_at_first_timestamp(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -111,9 +111,9 @@ def test_save_all_i_keyframes_between_two_timestamps_starts_at_first_timestamp(m
     mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_FRAMES, 121)
 
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
 def test_save_all_i_keyframes_between_two_timestamps_stops_at_last_timestamp(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -140,9 +140,9 @@ def test_save_all_i_keyframes_between_two_timestamps_stops_at_last_timestamp(moc
     assert 181 not in calls
 
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
 def test_save_all_i_keyframes_between_two_timestamps_only_saves_iframes(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -166,9 +166,9 @@ def test_save_all_i_keyframes_between_two_timestamps_only_saves_iframes(mock_get
     save_all_i_keyframes_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:06")
 
     expected_files = [
-        "output_dir//0frame_121.jpg",
-        "output_dir//1frame_150.jpg",
-        "output_dir//2frame_180.jpg"
+        "output_dir/frame_000004.jpg",  # 121 / 30 = 4 s
+        "output_dir/frame_000005.jpg",  # 150 / 30 = 5 s
+        "output_dir/frame_000006.jpg"   # 180 / 30 = 6 s
     ]
     actual_files = [call[0][0] for call in mock_imwrite.call_args_list]
     assert actual_files == expected_files
@@ -177,9 +177,9 @@ def test_save_all_i_keyframes_between_two_timestamps_only_saves_iframes(mock_get
 # ------------------------------------------------
 # TESTS for the function `save_all_p_keyframes`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.get_frame_types")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_save_all_p_keyframes_creates_correct_number_of_images(mock_imwrite, mock_VideoCapture, mock_get_frame_types, tmp_path):
     mock_get_frame_types.return_value = [(0, 'P'), (1, 'B'), (5, 'P'), (10, 'P'), (12, 'I')]
 
@@ -191,9 +191,9 @@ def test_save_all_p_keyframes_creates_correct_number_of_images(mock_imwrite, moc
 
     assert mock_imwrite.call_count == 3
 
-@patch("video_processing_toolkit.core.get_frame_types")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_save_all_p_keyframes_with_no_pframes(mock_imwrite, mock_VideoCapture, mock_get_frame_types, tmp_path):
     mock_get_frame_types.return_value = [(0, 'I'), (1, 'B'), (2, 'I')]
 
@@ -205,9 +205,9 @@ def test_save_all_p_keyframes_with_no_pframes(mock_imwrite, mock_VideoCapture, m
 
     mock_imwrite.assert_not_called()
 
-@patch("video_processing_toolkit.core.get_frame_types")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_save_all_p_keyframes_creates_correct_number_of_images(mock_imwrite, mock_VideoCapture, mock_get_frame_types, tmp_path):
     mock_get_frame_types.return_value = [(0, 'P'), (1, 'P'), (5, 'I'), (10, 'P'), (12, 'B')]
 
@@ -222,9 +222,9 @@ def test_save_all_p_keyframes_creates_correct_number_of_images(mock_imwrite, moc
 # ------------------------------------------------
 # TESTS for the function `save_all_p_keyframes_between_two_timestamps`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
 def test_save_all_p_keyframes_between_two_timestamps_starts_at_first_timestamp(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -248,9 +248,9 @@ def test_save_all_p_keyframes_between_two_timestamps_starts_at_first_timestamp(m
     mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_FRAMES, 121)
 
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
 def test_save_all_p_keyframes_between_two_timestamps_stops_at_last_timestamp(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -277,9 +277,9 @@ def test_save_all_p_keyframes_between_two_timestamps_stops_at_last_timestamp(moc
     assert 181 not in calls
 
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.get_frame_types")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.get_frame_types")
 def test_save_all_p_keyframes_between_two_timestamps_only_saves_pframes(mock_get_frame_types, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -303,10 +303,11 @@ def test_save_all_p_keyframes_between_two_timestamps_only_saves_pframes(mock_get
     save_all_p_keyframes_between_two_timestamps("video.mp4", "output_dir", "00:00:05", "00:00:06")
 
     expected_files = [
-        "output_dir//0frame_121.jpg",
-        "output_dir//1frame_150.jpg",
-        "output_dir//2frame_180.jpg"
+        "output_dir/frame_000004.jpg", 
+        "output_dir/frame_000005.jpg", 
+        "output_dir/frame_000006.jpg"
     ]
+
     actual_files = [call[0][0] for call in mock_imwrite.call_args_list]
     assert actual_files == expected_files
 
@@ -314,9 +315,9 @@ def test_save_all_p_keyframes_between_two_timestamps_only_saves_pframes(mock_get
 # ------------------------------------------------
 # TESTS for the function `convert_video`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.ffmpy.FFmpeg.run")
-@patch("video_processing_toolkit.core.ffmpy.FFmpeg")
-@patch("video_processing_toolkit.core.time.strftime")
+@patch("video_processing_toolkit.video_processing.ffmpy.FFmpeg.run")
+@patch("video_processing_toolkit.video_processing.ffmpy.FFmpeg")
+@patch("video_processing_toolkit.video_processing.time.strftime")
 def test_convert_video_builds_correct_avi_filename(mock_strftime, mock_ffmpeg_class, mock_run):
     mock_strftime.return_value = "20240506-154500"
 
@@ -334,9 +335,9 @@ def test_convert_video_builds_correct_avi_filename(mock_strftime, mock_ffmpeg_cl
 
     mock_ffmpeg.run.assert_called_once()
 
-@patch("video_processing_toolkit.core.ffmpy.FFmpeg.run")
-@patch("video_processing_toolkit.core.ffmpy.FFmpeg")
-@patch("video_processing_toolkit.core.time.strftime")
+@patch("video_processing_toolkit.video_processing.ffmpy.FFmpeg.run")
+@patch("video_processing_toolkit.video_processing.ffmpy.FFmpeg")
+@patch("video_processing_toolkit.video_processing.time.strftime")
 def test_convert_video_builds_correct_ffmpeg_command(mock_strftime, mock_ffmpeg_class, mock_run):
     mock_strftime.return_value = "20240506-154500"
 
@@ -350,9 +351,9 @@ def test_convert_video_builds_correct_ffmpeg_command(mock_strftime, mock_ffmpeg_
         outputs={"20240506-154500.avi": " -c:a mp3 -c:v mpeg4"}
     )
 
-@patch("video_processing_toolkit.core.ffmpy.FFmpeg.run")
-@patch("video_processing_toolkit.core.ffmpy.FFmpeg")
-@patch("video_processing_toolkit.core.time.strftime")
+@patch("video_processing_toolkit.video_processing.ffmpy.FFmpeg.run")
+@patch("video_processing_toolkit.video_processing.ffmpy.FFmpeg")
+@patch("video_processing_toolkit.video_processing.time.strftime")
 def test_convert_video_executes_ffmpeg_command(mock_strftime, mock_ffmpeg_class, mock_run):
     mock_strftime.return_value = "20240506-154500"
 
@@ -366,8 +367,8 @@ def test_convert_video_executes_ffmpeg_command(mock_strftime, mock_ffmpeg_class,
 # ------------------------------------------------
 # TESTS for the function `compute_frame_per_sec_rate`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.__version__", "4.5.2")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.__version__", "4.5.2")
 def test_compute_frame_per_sec_rate_opencv_v3(mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -379,8 +380,8 @@ def test_compute_frame_per_sec_rate_opencv_v3(mock_VideoCapture):
     mock_cap.get.assert_called_once_with(cv2.CAP_PROP_FPS)
     assert fps == 30
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.__version__", "2.4.13")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.__version__", "2.4.13")
 def test_compute_frame_per_sec_rate_opencv_v2(mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -398,10 +399,10 @@ def test_compute_frame_per_sec_rate_opencv_v2(mock_VideoCapture):
 # ------------------------------------------------
 # TESTS for the function `frames_to_video`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.os.path.isfile", return_value=True)
-@patch("video_processing_toolkit.core.os.listdir", return_value=["frame_1.jpg", "frame_2.jpg", "frame_3.jpg"])
-@patch("video_processing_toolkit.core.cv2.imread")
-@patch("video_processing_toolkit.core.cv2.VideoWriter")
+@patch("video_processing_toolkit.video_processing.os.path.isfile", return_value=True)
+@patch("video_processing_toolkit.video_processing.os.listdir", return_value=["frame_1.jpg", "frame_2.jpg", "frame_3.jpg"])
+@patch("video_processing_toolkit.video_processing.cv2.imread")
+@patch("video_processing_toolkit.video_processing.cv2.VideoWriter")
 def test_frames_to_video_reads_images(mock_writer, mock_imread, mock_listdir, mock_isfile):
     fake_img = np.ones((480, 640, 3), dtype=np.uint8)
     mock_imread.return_value = fake_img
@@ -410,10 +411,10 @@ def test_frames_to_video_reads_images(mock_writer, mock_imread, mock_listdir, mo
 
     assert mock_imread.call_count == 3
 
-@patch("video_processing_toolkit.core.os.path.isfile", return_value=True)
-@patch("video_processing_toolkit.core.os.listdir", return_value=["frame_1.jpg", "frame_2.jpg"])
-@patch("video_processing_toolkit.core.cv2.imread")
-@patch("video_processing_toolkit.core.cv2.VideoWriter")
+@patch("video_processing_toolkit.video_processing.os.path.isfile", return_value=True)
+@patch("video_processing_toolkit.video_processing.os.listdir", return_value=["frame_1.jpg", "frame_2.jpg"])
+@patch("video_processing_toolkit.video_processing.cv2.imread")
+@patch("video_processing_toolkit.video_processing.cv2.VideoWriter")
 def test_frames_to_video_writes_all_frames(mock_writer_class, mock_imread, mock_listdir, mock_isfile):
     fake_img = np.ones((480, 640, 3), dtype=np.uint8)
     mock_imread.return_value = fake_img
@@ -425,10 +426,10 @@ def test_frames_to_video_writes_all_frames(mock_writer_class, mock_imread, mock_
 
     assert writer.write.call_count == 2
 
-@patch("video_processing_toolkit.core.os.path.isfile", return_value=True)
-@patch("video_processing_toolkit.core.os.listdir", return_value=["frame_1.jpg"])
-@patch("video_processing_toolkit.core.cv2.imread")
-@patch("video_processing_toolkit.core.cv2.VideoWriter")
+@patch("video_processing_toolkit.video_processing.os.path.isfile", return_value=True)
+@patch("video_processing_toolkit.video_processing.os.listdir", return_value=["frame_1.jpg"])
+@patch("video_processing_toolkit.video_processing.cv2.imread")
+@patch("video_processing_toolkit.video_processing.cv2.VideoWriter")
 def test_frames_to_video_releases_video_writer(mock_writer_class, mock_imread, mock_listdir, mock_isfile):
     fake_img = np.ones((480, 640, 3), dtype=np.uint8)
     mock_imread.return_value = fake_img
@@ -443,9 +444,9 @@ def test_frames_to_video_releases_video_writer(mock_writer_class, mock_imread, m
 # ------------------------------------------------
 # TESTS for the function `video_to_all_frames`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.os.mkdir")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.os.mkdir")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_video_to_all_frames_creates_output_dir(mock_imwrite, mock_VideoCapture, mock_mkdir):
     mock_cap = MagicMock()
     mock_cap.get.return_value = 1
@@ -455,9 +456,9 @@ def test_video_to_all_frames_creates_output_dir(mock_imwrite, mock_VideoCapture,
     video_to_all_frames("video.mp4", "output_dir")
     mock_mkdir.assert_called_once_with("output_dir")
 
-@patch("video_processing_toolkit.core.os.mkdir")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.os.mkdir")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_video_to_all_frames_reads_frames_correctly(mock_imwrite, mock_VideoCapture, mock_mkdir):
     mock_cap = MagicMock()
     mock_cap.get.return_value = 4
@@ -469,9 +470,9 @@ def test_video_to_all_frames_reads_frames_correctly(mock_imwrite, mock_VideoCapt
 
     assert mock_cap.read.call_count == 3
 
-@patch("video_processing_toolkit.core.os.mkdir")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.os.mkdir")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_video_to_all_frames_writes_frames(mock_imwrite, mock_VideoCapture, mock_mkdir):
     mock_cap = MagicMock()
     mock_cap.get.return_value = 4
@@ -483,9 +484,9 @@ def test_video_to_all_frames_writes_frames(mock_imwrite, mock_VideoCapture, mock
 
     assert mock_imwrite.call_count == 3
 
-@patch("video_processing_toolkit.core.os.mkdir")
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.os.mkdir")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_video_to_all_frames_output_file_names(mock_imwrite, mock_VideoCapture, mock_mkdir):
     mock_cap = MagicMock()
     mock_cap.get.return_value = 4
@@ -505,8 +506,8 @@ def test_video_to_all_frames_output_file_names(mock_imwrite, mock_VideoCapture, 
 # ------------------------------------------------
 # TESTS for the function `extract_images_regular_interval`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_extract_images_regular_interval_creates_images(mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_cap.read.side_effect = [(True, "frame1"), (True, "frame2"), (False, None)]
@@ -522,8 +523,8 @@ def test_extract_images_regular_interval_creates_images(mock_imwrite, mock_Video
     actual_files = [call[0][0] for call in mock_imwrite.call_args_list]
     assert actual_files == expected_files
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_extract_images_regular_interval_sets_correct_position_in_the_video(mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_cap.read.side_effect = [
@@ -540,8 +541,8 @@ def test_extract_images_regular_interval_sets_correct_position_in_the_video(mock
     mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_MSEC, 1 * 5000)
     mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_MSEC, 2 * 5000)
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_extract_images_regular_interval_releases_video(mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_cap.read.side_effect = [(True, "frame1"), (False, None)]
@@ -554,9 +555,9 @@ def test_extract_images_regular_interval_releases_video(mock_imwrite, mock_Video
 # ------------------------------------------------
 # TESTS for the function `extract_images_at_particular_timestamp`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.compute_frame_per_sec_rate")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.compute_frame_per_sec_rate")
 def test_extract_images_at_particular_timestamp_starts_at_correct_timestamp(mock_compute_fps, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -568,9 +569,9 @@ def test_extract_images_at_particular_timestamp_starts_at_correct_timestamp(mock
 
     mock_cap.set.assert_called_once_with(cv2.CAP_PROP_POS_MSEC, 5000)
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.compute_frame_per_sec_rate")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.compute_frame_per_sec_rate")
 def test_extract_images_at_particular_timestamp_saves_correctly(mock_compute_fps, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -582,9 +583,9 @@ def test_extract_images_at_particular_timestamp_saves_correctly(mock_compute_fps
 
     mock_imwrite.assert_called_once_with("output_dir/%#05d.jpg" % 150, "frame_image")
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.compute_frame_per_sec_rate")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.compute_frame_per_sec_rate")
 def test_extract_images_at_particular_timestamp_releases_video_capture(mock_compute_fps, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -596,9 +597,9 @@ def test_extract_images_at_particular_timestamp_releases_video_capture(mock_comp
 
     mock_cap.release.assert_called_once()
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
-@patch("video_processing_toolkit.core.compute_frame_per_sec_rate")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.compute_frame_per_sec_rate")
 def test_extract_images_at_particular_timestamp_only_image_at_5_seconds(mock_compute_fps, mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -620,8 +621,8 @@ def test_extract_images_at_particular_timestamp_only_image_at_5_seconds(mock_com
 # ------------------------------------------------
 # TESTS for the function `extract_images_between_two_timestamps`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_extract_images_between_two_timestamps_position_cursor_at_start_timestamp(mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -636,8 +637,8 @@ def test_extract_images_between_two_timestamps_position_cursor_at_start_timestam
     mock_cap.set.assert_called_once_with(cv2.CAP_PROP_POS_MSEC, 5000)
 
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_extract_images_between_two_timestamps(mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_cap.get.return_value = 30  #30 FPS
@@ -660,8 +661,8 @@ def test_extract_images_between_two_timestamps(mock_imwrite, mock_VideoCapture):
     actual_files = [call[0][0] for call in mock_imwrite.call_args_list]
     assert actual_files == expected_files
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_extract_images_between_two_timestamps_stops_reading_after_last_timestamp(mock_imwrite, mock_VideoCapture):
 
     mock_cap = MagicMock()
@@ -680,8 +681,8 @@ def test_extract_images_between_two_timestamps_stops_reading_after_last_timestam
 # ------------------------------------------------
 # TESTS for the function `extract_regular_interval_images_between_two_timestamps`
 # ------------------------------------------------
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def extract_regular_interval_images_between_two_timestamps_starts_at_correct_timestamp(mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -703,8 +704,8 @@ def extract_regular_interval_images_between_two_timestamps_starts_at_correct_tim
 
     mock_cap.set.assert_any_call(cv2.CAP_PROP_POS_MSEC, 5000)
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_extract_regular_interval_images_between_two_timestamps(mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -735,8 +736,8 @@ def test_extract_regular_interval_images_between_two_timestamps(mock_imwrite, mo
     for call, expected in zip(actual_calls, expected_calls):
         assert call[0] == expected
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_extract_regular_interval_images_between_two_timestamps_stops_at_last_timestamp(mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
@@ -760,8 +761,8 @@ def test_extract_regular_interval_images_between_two_timestamps_stops_at_last_ti
     calls = [call[0][1] for call in mock_cap.set.call_args_list]
     assert all(time <= 6000 for time in calls)
 
-@patch("video_processing_toolkit.core.cv2.VideoCapture")
-@patch("video_processing_toolkit.core.cv2.imwrite")
+@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
+@patch("video_processing_toolkit.video_processing.cv2.imwrite")
 def test_extract_regular_interval_images_between_two_timestamps_saves_only_valid_frames(mock_imwrite, mock_VideoCapture):
     mock_cap = MagicMock()
     mock_VideoCapture.return_value = mock_cap
