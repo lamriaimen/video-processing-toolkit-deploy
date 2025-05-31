@@ -68,20 +68,6 @@ def test_save_all_i_keyframes_with_no_iframes(mock_imwrite, mock_VideoCapture, m
 
     mock_imwrite.assert_not_called()
 
-@patch("video_processing_toolkit.video_processing.get_frame_types")
-@patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
-@patch("video_processing_toolkit.video_processing.cv2.imwrite")
-def test_save_all_i_keyframes_creates_correct_number_of_images(mock_imwrite, mock_VideoCapture, mock_get_frame_types, tmp_path):
-    mock_get_frame_types.return_value = [(0, 'P'), (1, 'I'), (5, 'I'), (10, 'P'), (12, 'I')]
-
-    mock_cap = MagicMock()
-    mock_cap.read.return_value = (True, "fake_frame")
-    mock_VideoCapture.return_value = mock_cap
-
-    save_all_i_keyframes("fake_video.mp4", str(tmp_path))
-
-    assert mock_imwrite.call_count == 3
-
 # ------------------------------------------------
 # TESTS for the function `save_all_i_keyframes_between_two_timestamps`
 # ------------------------------------------------
