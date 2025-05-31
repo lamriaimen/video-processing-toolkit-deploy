@@ -5,6 +5,8 @@ import time
 import ffmpy
 import numpy as np
 import subprocess
+print(f"LOADED MODULE: {__name__}")
+
 
 def get_frame_types(video_file):
     """
@@ -651,3 +653,5 @@ def process_input_video_give_video_output(input_loc, output_loc, function_to_app
                 break
 
         out.release()
+
+print(f"LOADED MODULE: {__name__}")
