@@ -77,7 +77,7 @@ Basic example:
 .. code-block:: python
 
     # Extract all I-frames from a video and save them to the specified directory
-    from video_processing_toolkit import VideoProcessor
+    from video_processing_toolkit import save_all_i_keyframes
     save_all_i_keyframes ("video.mp4", "/output_frames")
 
 See the full documentation for detailed usage and advanced options.
