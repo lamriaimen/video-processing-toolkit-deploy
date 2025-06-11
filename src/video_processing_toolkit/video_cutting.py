@@ -1,8 +1,10 @@
 import subprocess
+from .video_processing import compute_frame_per_sec_rate
 
 def get_clip(input_filename, output_filename, start_time, end_time):
     """
-    Cuts a video using ffmpeg with re-encoding to ensure clean playback.
+    Cuts a video using ffmpeg while preserving the original framerate and 
+    forcing one I-frame per second for clean frame extraction.
 
     Args:
         input_filename (str): Path to the input video.
@@ -10,17 +12,27 @@ def get_clip(input_filename, output_filename, start_time, end_time):
         start_time (float): Start time in seconds.
         end_time (float): End time in seconds.
     """
+    framerate = compute_frame_per_sec_rate(input_filename)
+    gop_size = int(framerate)
+
     command = [
         "ffmpeg",
-        "-y",  # Overwrite without asking
-        "-ss", str(start_time),
-        "-to", str(end_time),
-        "-i", input_filename,
-        "-c:v", "libx264",
-        "-c:a", "aac",
-        "-strict", "experimental",
-        output_filename
+        "-y",                           # Overwrite output file without asking
+        "-ss", str(start_time),        # Start time of the clip (in seconds or HH:MM:SS)
+        "-to", str(end_time),          # End time of the clip
+        "-i", input_filename,          # Input video file
+        "-r", str(framerate),          # Set output video framerate
+        "-c:v", "libx264",             # Encode video using H.264 codec
+        "-crf", "23",                  # Constant Rate Factor (quality setting, lower is better quality)
+        "-g", str(gop_size),           # Group of Pictures size (distance between I-frames)
+        "-keyint_min", str(gop_size), # Minimum interval between I-frames (set equal to GOP size for forced I-frame interval)
+        "-sc_threshold", "0",         # Scene change threshold (0 disables scene detection for I-frames)
+        "-preset", "slow",            # Compression efficiency vs. speed
+        "-movflags", "+faststart",    # Optimize MP4 for web streaming
+        "-c:a", "aac",                # Encode audio using AAC codec
+        output_filename               # Output video file path
     ]
+
     subprocess.run(command, check=True)
 
 def cut_video_clips(input_filename, output_file_path, time_stamp_start_1, time_stamp_end_1):
@@ -29,10 +41,10 @@ def cut_video_clips(input_filename, output_file_path, time_stamp_start_1, time_s
         "time_stamp_end_1", to crop the video clips based on these start and end time stamps.
 
         Args:
-            input_filename: Path of the input video file
-            output_file_path: The path of the output file clip
-            time_stamp_start_1 : The list of start time in HH:MM:SS format
-            time_stamp_end_1 : The list of end time in HH:MM:SS format.
+            input_filename (str): Path of the input video file
+            output_file_path (str): The path of the output file clip
+            time_stamp_start_1 (List[str]): The list of start time in HH:MM:SS format
+            time_stamp_end_1 (List[str]): The list of end time in HH:MM:SS format.
         Returns:
             None
         """
