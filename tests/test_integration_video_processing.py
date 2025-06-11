@@ -221,14 +221,11 @@ def test_convert_video(tmp_path):
 
 def test_compute_frame_per_sec_rate():
     video_path = "tests/video_test.mp4"
-    cap = cv2.VideoCapture(video_path)
 
-    fps = compute_frame_per_sec_rate(cap)
+    fps = compute_frame_per_sec_rate(video_path)
     
     assert isinstance(fps, (int, float)), "FPS doit être un nombre"
     assert fps == 30, "FPS doit être strictement positif"
-
-    cap.release()
 
 def test_video_to_all_frames(tmp_path):
     video_path = "tests/video_test.mp4"

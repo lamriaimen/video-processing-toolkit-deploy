@@ -354,33 +354,25 @@ def test_convert_video_executes_ffmpeg_command(mock_strftime, mock_ffmpeg_class,
 # TESTS for the function `compute_frame_per_sec_rate`
 # ------------------------------------------------
 @patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
-@patch("video_processing_toolkit.video_processing.cv2.__version__", "4.5.2")
-def test_compute_frame_per_sec_rate_opencv_v3(mock_VideoCapture):
+def test_compute_frame_per_sec_rate_returns_fps(mock_VideoCapture):
     mock_cap = MagicMock()
+    mock_cap.isOpened.return_value = True
+    mock_cap.get.return_value = 30  # simulate typical framerate
     mock_VideoCapture.return_value = mock_cap
-    
-    mock_cap.get.return_value = 30
 
-    fps = compute_frame_per_sec_rate(mock_cap)
+    fps = compute_frame_per_sec_rate("video.mp4")
 
-    mock_cap.get.assert_called_once_with(cv2.CAP_PROP_FPS)
     assert fps == 30
+    mock_cap.release.assert_called_once()
 
 @patch("video_processing_toolkit.video_processing.cv2.VideoCapture")
-@patch("video_processing_toolkit.video_processing.cv2.__version__", "2.4.13")
-def test_compute_frame_per_sec_rate_opencv_v2(mock_VideoCapture):
+def test_compute_frame_per_sec_rate_raises_error_on_invalid_video(mock_VideoCapture):
     mock_cap = MagicMock()
+    mock_cap.isOpened.return_value = False
     mock_VideoCapture.return_value = mock_cap
 
-    cv2.cv = MagicMock()
-    cv2.cv.CV_CAP_PROP_FPS = 5
-
-    mock_cap.get.return_value = 25
-
-    fps = compute_frame_per_sec_rate(mock_cap)
-
-    mock_cap.get.assert_called_once_with(cv2.cv.CV_CAP_PROP_FPS)
-    assert fps == 25
+    with pytest.raises(IOError, match="Cannot open video file: video.mp4"):
+        compute_frame_per_sec_rate("video.mp4")
 
 # ------------------------------------------------
 # TESTS for the function `frames_to_video`

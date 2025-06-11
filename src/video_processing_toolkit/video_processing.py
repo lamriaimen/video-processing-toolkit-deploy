@@ -269,27 +269,22 @@ def convert_video(inputed_file):
     return video_name
 
 
-def compute_frame_per_sec_rate(video_file: str) -> int:
-    """Function to compute the frame per seconds or pfs.
+def compute_frame_per_sec_rate(video_file: str) -> float:
+    """
+    Compute the framerate (frames per second) of the video using OpenCV.
 
     Args:
-        video_file (str): Path of the video file.
+        video_file (str): Path to the video file.
     Returns:
-        int : The Frame rate of the created video stream.
+        float: The framerate of the video.
     """
-    # Find OpenCV version
-    (major_ver, minor_ver, subminor_ver) = cv2.__version__.split('.')
-
-    if int(major_ver) < 3:
-        fps = video_file.get(cv2.cv.CV_CAP_PROP_FPS)
-        print("Frames per second using video.get(cv2.cv.CV_CAP_PROP_FPS): {0}".format(fps))
-    else:
-        fps = video_file.get(cv2.CAP_PROP_FPS)
-        print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
-    # video_file.release()
-
+    cap = cv2.VideoCapture(video_file)
+    if not cap.isOpened():
+        raise IOError(f"Cannot open video file: {video_file}")
+    
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    cap.release()
     return fps
-
 
 def frames_to_video(input_path, output_path, fps):
     """Function reads all the individual frames, saved in a directory and then use them to create a video.
@@ -419,7 +414,7 @@ def extract_images_at_particular_timestamp(path_in, path_out, hh_mm_ss):
 
     time_in_millisec = (get_hours * 60 * 60 + get_mins * 60 + get_secs) * 1000
     time_in_sec = (get_hours * 60 * 60 + get_mins * 60 + get_secs)
-    get_fps = int(compute_frame_per_sec_rate(vidcap))
+    get_fps = int(compute_frame_per_sec_rate(path_in))
 
     # See carefully, the following multiplication will give the last frame of time stamp 'time_in_sec'. Because on
     # second 1, we will have 30 frames (e.g. FPS = 30), on second 2, we will have 2*30 = 60 frames then on 'time_in_sec'
@@ -589,8 +584,7 @@ def process_input_video_give_video_output(input_loc, output_loc, function_to_app
             None
         """
 
-        vidcap = cv2.VideoCapture(input_loc)  # read the video
-        get_fps = VideoOperation.compute_frame_per_sec_rate(vidcap)
+        get_fps = compute_frame_per_sec_rate(input_loc)
 
         # Log the time
         time_start = time.time()
