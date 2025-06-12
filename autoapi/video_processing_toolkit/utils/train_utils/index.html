@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>video_processing_toolkit.utils.train_utils &mdash; Video Processing Toolkit 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Video Processing Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../readme.html">Video Processing Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../history.html">History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Video Processing Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">video_processing_toolkit.utils.train_utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/video_processing_toolkit/utils/train_utils/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-video_processing_toolkit.utils.train_utils">
+<span id="video-processing-toolkit-utils-train-utils"></span><h1>video_processing_toolkit.utils.train_utils<a class="headerlink" href="#module-video_processing_toolkit.utils.train_utils" title="Link to this heading"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.get_annotations">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.train_utils.</span></span><span class="sig-name descname"><span class="pre">get_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annot_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.get_annotations" title="Link to this definition"></a></dt>
+<dd><p>Gets the annotations contained in the xml file of the current frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>annot_dir</strong> (<em>str</em>) – The root dir of annotation folders</p></li>
+<li><p><strong>sequence_dir</strong> (<em>str</em>) – The directory in which frame is located, relative to</p></li>
+<li><p><strong>directory</strong> (<em>root</em>)</p></li>
+<li><p><strong>frame_file</strong> (<em>str</em>) – The frame filename</p></li>
+<li><p><strong>i.e.</strong></p></li>
+<li><p><strong>sequence_identifier/frame_number.JPEG</strong></p></li>
+<li><p><strong>path.</strong> (<em>or the full</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>(dictionary) A dictionary containing the four values of the</dt><dd><p>the bounding box stored in the following keywords:
+‘xmax’ (int): The rightmost x coordinate of the bounding box.
+‘xmin’ (int): The leftmost x coordinate of the bounding box.
+‘ymax’ (int): The uppermost y coordinate of the bounding box.
+‘ymin’ (int): The lowest y coordinate of the bounding box.</p>
+</dd>
+</dl>
+<p>width (int): The width of the jpeg image in pixels.
+height (int): The height of the jpeg image in pixels.
+valid_frame (bool): False if the target is present in the frame,</p>
+<blockquote>
+<div><p>and True otherwise.</p>
+</div></blockquote>
+<p>OBS: If the target is not in the frame the bounding box information
+are all None.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>annotation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.check_folder_tree">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.train_utils.</span></span><span class="sig-name descname"><span class="pre">check_folder_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.check_folder_tree" title="Link to this definition"></a></dt>
+<dd><p>Checks if the folder structure is compatible with the expected one.
+:param root_dir: (str) The path to the root directory of the dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the structure is compatible, False otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.Params">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.train_utils.</span></span><span class="sig-name descname"><span class="pre">Params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.Params" title="Link to this definition"></a></dt>
+<dd><p>Class that loads hyperparameters from a json file.
+Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">params</span> <span class="pre">=</span> <span class="pre">Params(json_path)</span>
+<span class="pre">print(params.learning_rate)</span>
+<span class="pre">params.learning_rate</span> <span class="pre">=</span> <span class="pre">0.5</span>&#160; <span class="pre">#</span> <span class="pre">change</span> <span class="pre">the</span> <span class="pre">value</span> <span class="pre">of</span> <span class="pre">learning_rate</span> <span class="pre">in</span> <span class="pre">params</span>
+<span class="pre">`</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.Params.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.Params.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.Params.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.Params.update" title="Link to this definition"></a></dt>
+<dd><p>Loads parameters from json file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.Params.update_with_dict">
+<span class="sig-name descname"><span class="pre">update_with_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictio</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.Params.update_with_dict" title="Link to this definition"></a></dt>
+<dd><p>Updates the parameters with the keys and values of a dictionary.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.Params.dict">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dict</span></span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.Params.dict" title="Link to this definition"></a></dt>
+<dd><p>Gives dict-like access to Params instance by <a href="#id1"><span class="problematic" id="id2">`</span></a>params.dict[‘learning_rate’]</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.RunningAverage">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.train_utils.</span></span><span class="sig-name descname"><span class="pre">RunningAverage</span></span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.RunningAverage" title="Link to this definition"></a></dt>
+<dd><p>A simple class that maintains the running average of a quantity</p>
+<p>Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">loss_avg</span> <span class="pre">=</span> <span class="pre">RunningAverage()</span>
+<span class="pre">loss_avg.update(2)</span>
+<span class="pre">loss_avg.update(4)</span>
+<span class="pre">loss_avg()</span> <span class="pre">=</span> <span class="pre">3</span>
+<span class="pre">`</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.RunningAverage.steps">
+<span class="sig-name descname"><span class="pre">steps</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.RunningAverage.steps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.RunningAverage.total">
+<span class="sig-name descname"><span class="pre">total</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.RunningAverage.total" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.RunningAverage.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.RunningAverage.update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.set_logger">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.train_utils.</span></span><span class="sig-name descname"><span class="pre">set_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.set_logger" title="Link to this definition"></a></dt>
+<dd><p>Set the logger to log info in terminal and file <cite>log_path</cite>.
+In general, it is useful to have a logger so that every output to the
+terminal is saved in a permanent file.
+Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">logging.info(&quot;Starting</span> <span class="pre">training...&quot;)</span>
+<span class="pre">`</span></code>
+:param log_path: (string) where to log</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.save_dict_to_json">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.train_utils.</span></span><span class="sig-name descname"><span class="pre">save_dict_to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.save_dict_to_json" title="Link to this definition"></a></dt>
+<dd><p>Saves dict of floats in json file
+:param d: (dict) of float-castable values (np.float, int, float, etc.)
+:param json_path: (string) path to json file</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.save_checkpoint">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.train_utils.</span></span><span class="sig-name descname"><span class="pre">save_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_best</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.save_checkpoint" title="Link to this definition"></a></dt>
+<dd><p>Saves model and training parameters at checkpoint + ‘last.pth.tar’.
+If is_best==True, also saves checkpoint + ‘best.pth.tar’
+:param state: (dict) contains model’s state_dict, may contain other keys such</p>
+<blockquote>
+<div><p>as epoch, optimizer state_dict</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is_best</strong> – (bool) True if it is the best
+model seen till now</p></li>
+<li><p><strong>checkpoint</strong> – (string) folder where parameters are
+to be saved</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.train_utils.load_checkpoint">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.train_utils.</span></span><span class="sig-name descname"><span class="pre">load_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.train_utils.load_checkpoint" title="Link to this definition"></a></dt>
+<dd><p>Loads model parameters (state_dict) from file_path. If optimizer is
+provided, loads state_dict of optimizer assuming it is present in
+checkpoint.
+:param checkpoint: (string) filename which needs to be loaded
+:param model: (torch.nn.Module) model for which the parameters are loaded
+:param optimizer: (torch.optim) optional: resume optimizer from checkpoint</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alyssia Fourali, Loic Scoth, Mohamed Said Aimen Lamri, Gaspar Henniaux.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

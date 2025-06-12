@@ -1,0 +1,7 @@
+video\_processing\_toolkit.video\_cutting module
+================================================
+
+.. automodule:: video_processing_toolkit.video_cutting
+   :members:
+   :show-inheritance:
+   :undoc-members:

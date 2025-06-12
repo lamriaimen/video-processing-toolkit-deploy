@@ -1,0 +1,43 @@
+video_processing_toolkit.video_cutting
+======================================
+
+.. py:module:: video_processing_toolkit.video_cutting
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: get_clip(input_filename, output_filename, start_time, end_time)
+
+   Cuts a video using ffmpeg while preserving the original framerate and
+   forcing one I-frame per second for clean frame extraction.
+
+   :param input_filename: Path to the input video.
+   :type input_filename: str
+   :param output_filename: Path to save the output video.
+   :type output_filename: str
+   :param start_time: Start time in seconds.
+   :type start_time: float
+   :param end_time: End time in seconds.
+   :type end_time: float
+
+
+.. py:function:: cut_video_clips(input_filename, output_file_path, time_stamp_start_1, time_stamp_end_1)
+
+   Function to read several start and end time stamps, mentioned in two vectors; "time_stamp_start_1" and
+   "time_stamp_end_1", to crop the video clips based on these start and end time stamps.
+
+   :param input_filename: Path of the input video file
+   :type input_filename: str
+   :param output_file_path: The path of the output file clip
+   :type output_file_path: str
+   :param time_stamp_start_1: The list of start time in HH:MM:SS format
+   :type time_stamp_start_1: List[str]
+   :param time_stamp_end_1: The list of end time in HH:MM:SS format.
+   :type time_stamp_end_1: List[str]
+
+   :returns: None
+
+

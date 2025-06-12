@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>video_processing_toolkit.utils.perform_image_operation &mdash; Video Processing Toolkit 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Video Processing Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../readme.html">Video Processing Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../history.html">History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Video Processing Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">video_processing_toolkit.utils.perform_image_operation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/video_processing_toolkit/utils/perform_image_operation/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-video_processing_toolkit.utils.perform_image_operation">
+<span id="video-processing-toolkit-utils-perform-image-operation"></span><h1>video_processing_toolkit.utils.perform_image_operation<a class="headerlink" href="#module-video_processing_toolkit.utils.perform_image_operation" title="Link to this heading"></a></h1>
+<p>This module exposes the image processing methods as module level global
+variables, that are loaded based on user defined flags.</p>
+<p>Since there are multiple different implementations and libraries available for each
+of the image tasks we want to perform (e.g ‘load jpeg’ and ‘resize’), we give the
+user the choice of using different versions of each function without changing
+the rest of the code. One example in which one would use a ‘safe’ flag is if
+there are non jpeg images in the dataset, as imageio.imread can read them,
+but not jpeg4py.</p>
+<p>The basic changes introduced here are the libjpeg-turbo which is a instruction
+level parallel (SSE, AVX, etc) implementation of the default C++ jpeg lib
+libjpeg. Morover we also switched the default Pillow for a fork called PIL-SIMD,
+which is identical in terms of the API but uses vectorized instructions as well
+as heavy loop unrolling to optimize some of Pillows functions (particularly the
+resize function). Since the PIL-SIMD is a drop-in replacement for Pillow, even
+if the SIMD version is not installed the program should work just as fine with
+the default Pillow (without the massive speed gains, though).</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.LIBJPEG_TURBO_PRESENT">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">LIBJPEG_TURBO_PRESENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.LIBJPEG_TURBO_PRESENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.VALID_FLAGS">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">VALID_FLAGS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['fast',</span> <span class="pre">'safe']</span></em><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.VALID_FLAGS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.PIL_FLAGS">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">PIL_FLAGS</span></span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.PIL_FLAGS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.decode_jpeg_fast">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">decode_jpeg_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.decode_jpeg_fast" title="Link to this definition"></a></dt>
+<dd><p>Jpeg decoding method implemented by jpeg4py, available in
+<a class="reference external" href="https://github.com/ajkxyz/jpeg4py">https://github.com/ajkxyz/jpeg4py</a> . This library binds the libjpeg-turbo
+C++ library (available in
+<a class="reference external" href="https://github.com/libjpeg-turbo/libjpeg-turbo/blob/master/BUILDING.md">https://github.com/libjpeg-turbo/libjpeg-turbo/blob/master/BUILDING.md</a>),
+and can be up to 9 times faster than the non SIMD implementation.
+Requires libjpeg-turbo, built and installed correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.get_decode_jpeg_fcn">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">get_decode_jpeg_fcn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fast'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.get_decode_jpeg_fcn" title="Link to this definition"></a></dt>
+<dd><p>Yields the function demanded by the user based on the flags given and
+the system responses to imports. If the demanded function is not
+available an exception is raised and the user is informed it should try
+using another flag.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.resize_fast">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">resize_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_tup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.resize_fast" title="Link to this definition"></a></dt>
+<dd><p>Implements the PIL resize method from a numpy image input, using the
+same interface as the scipy imresize method.
+OBS: if concerned with the resizing of the correlation score map, the
+default behavior of the PIL resize is to align the corners, so we can
+simply use resize(img, (129,129)) without any problems. The center pixel
+is kept in the center (at least for the 4x upscale) and the corner pixels
+aligned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> – (numpy.ndarray) A numpy RGB image.</p></li>
+<li><p><strong>size_tup</strong> – (tuple) A 2D tuple containing the height and weight of the
+resized image.</p></li>
+<li><p><strong>interp</strong> – (str) The flag indicating the interpolation method. Available
+methods include ‘bilinear’, ‘bicubic’ and ‘nearest’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(numpy.ndarray) The resized image</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>img_res</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.get_resize_fcn">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">get_resize_fcn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fast'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.get_resize_fcn" title="Link to this definition"></a></dt>
+<dd><p>Yields the resize function demanded by the user based on the flags given
+and the system responses to imports. If the demanded function is not
+available an exception is raised and the user is informed it should try
+using another flag.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.pad_image">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">pad_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.pad_image" title="Link to this definition"></a></dt>
+<dd><p>Factory function to generate pads dictionaries with the placeholders for
+the amount of padding in each direction of an image. Note: the ‘up’ direction
+is up in relation to the displayed image, thus it represent the negative
+direction of the y indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dictionary) The padding in each direction.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pads</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.crop_img">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">crop_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_s</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.crop_img" title="Link to this definition"></a></dt>
+<dd><p>Crops an image given its center and the side of the crop region.
+If the crop exceeds the size of the image, it calculates how much padding
+it should have in each one of the four sides. In the case that the bounding
+box has an even number of pixels in either dimension we approach the center
+of the bounding box as the floor in each dimension, which may displace the
+actual center half a pixel in each dimension. This way we always deal with
+bounding boxes of odd size in each dimension. Furthermore, we add the same
+amount of context region in every direction, which makes the effective
+region size always an odd integer as well, so to enforce this approach we
+require the region size to be an odd integer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> – (numpy.ndarray) The image to be cropped. Must be of dimensions
+[height, width, channels]</p></li>
+<li><p><strong>cy</strong> – (int) The y coordinate of the center of the target.</p></li>
+<li><p><strong>cx</strong> – (int) The x coordinate of the center of the target.</p></li>
+<li><p><strong>reg_s</strong> – The side of the square region around the target, in pixels. Must
+be an odd integer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>(numpy.ndarray) The cropped image.
+pads: (dictionary) A dictionary with the amount of padding in pixels in</p>
+<blockquote>
+<div><p>each side. The order is: up, down, left, right, or it can be
+accessed by their names, e.g.: pads[‘up’]</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cropped_img</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.resize_and_pad">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">resize_and_pad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cropped_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_avg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_fcn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">resize</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.resize_and_pad" title="Link to this definition"></a></dt>
+<dd><p>Resizes and pads the cropped image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cropped_img</strong> – (numpy.ndarray) The cropped image.</p></li>
+<li><p><strong>out_sz</strong> – (int) Output size, the desired size of the output.</p></li>
+<li><p><strong>pads</strong> – (dictionary) A dictionary of the amount of pad in each side of the
+cropped image. They can be accessed by their names, e.g.: pads[‘up’]</p></li>
+<li><p><strong>reg_s</strong> – (int) Optional: The region side, used to check that the crop size
+plus the padding amount is equal to the region side in each axis.</p></li>
+<li><p><strong>use_avg</strong> – (bool) Indicates the mode of padding employed. If True, the
+image is padded with the mean value, else it is padded with zeroes.</p></li>
+<li><p><strong>resize_fcn</strong> – The image resize function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>(numpy.ndarray) The output image, resized and padded. Has size</dt><dd><p>(out_sz, out_sz).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>out_img</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.crop_and_resize">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">crop_and_resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">border_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">cv2.BORDER_CONSTANT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">border_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">cv2.INTER_LINEAR</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.crop_and_resize" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.pad_frame">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">pad_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_avg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.pad_frame" title="Link to this definition"></a></dt>
+<dd><p>Pads a frame equally on all sides, enough to fit a region of size
+patch_sz centered in (pos_x, pos_y). If the region is already inside the
+frame, it doesn’t do anything.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>im</strong> – (numpy.ndarray) The image to be padded.</p></li>
+<li><p><strong>frame_sz</strong> – (tuple) The width and height of the frame in pixels.</p></li>
+<li><p><strong>pos_x</strong> – (int) The x coordinate of the center of the target in the frame.</p></li>
+<li><p><strong>pos_y</strong> – (int) The y coordinate of the center of the target in the frame.</p></li>
+<li><p><strong>path_sz</strong> – (int) The size of the patch corresponding to the context
+region around the bounding box.</p></li>
+<li><p><strong>use_avg</strong> – (bool) Indicates if we should pad with the mean value of the
+pixels in the image (True) or zero (False).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(numpy.ndarray) The image after the padding.
+npad: (int) the amount of padding applied</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>im_padded</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.extract_crops_z">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">extract_crops_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz_src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz_dst</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.extract_crops_z" title="Link to this definition"></a></dt>
+<dd><p>Extracts the reference patch from the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>im</strong> – (numpy.ndarray) The padded image.</p></li>
+<li><p><strong>npad</strong> – (int) The amount of padding added to each side.</p></li>
+<li><p><strong>pos_x</strong> – (int) The x coordinate of the center of the reference in the
+original frame, not considering the padding.</p></li>
+<li><p><strong>pos_y</strong> – (int) The y coordinate of the center of the reference in the
+original frame, not considering the padding.</p></li>
+<li><p><strong>sz_src</strong> – (int) The original size of the reference patch.</p></li>
+<li><p><strong>sz_dst</strong> – (int) The final size of the patch (usually 127)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>(numpy.ndarray) The cropped image containing the reference with its</dt><dd><p>context region.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>crop</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.extract_crops_x">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">extract_crops_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz_src0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz_src1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz_src2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz_dst</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.extract_crops_x" title="Link to this definition"></a></dt>
+<dd><p>Extracts the 3 scaled crops of the search patch from the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>im</strong> – (numpy.ndarray) The padded image.</p></li>
+<li><p><strong>npad</strong> – (int) The amount of padding added to each side.</p></li>
+<li><p><strong>pos_x</strong> – (int) The x coordinate of the center of the bounding box in the
+original frame, not considering the padding.</p></li>
+<li><p><strong>pos_y</strong> – (int) The y coordinate of the center of the bounding box in the
+original frame, not considering the padding.</p></li>
+<li><p><strong>sz_src0</strong> – (int) The downscaled size of the search region.</p></li>
+<li><p><strong>sz_src1</strong> – (int) The original size of the search region.</p></li>
+<li><p><strong>sz_src2</strong> – (int) The upscaled size of the search region.</p></li>
+<li><p><strong>sz_dst</strong> – (int) The final size for each crop (usually 255)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(numpy.ndarray) The 3 cropped images containing the search region
+in 3 different scales.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>crops</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.read_image">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">read_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cvt_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">cv2.COLOR_BGR2RGB</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.read_image" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="video_processing_toolkit.utils.perform_image_operation.show_image">
+<span class="sig-prename descclassname"><span class="pre">video_processing_toolkit.utils.perform_image_operation.</span></span><span class="sig-name descname"><span class="pre">show_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ltwh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visualize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cvt_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">cv2.COLOR_RGB2BGR</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_processing_toolkit.utils.perform_image_operation.show_image" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alyssia Fourali, Loic Scoth, Mohamed Said Aimen Lamri, Gaspar Henniaux.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,778 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>video_processing_toolkit.video_processing &mdash; Video Processing Toolkit 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Video Processing Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Video Processing Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Video Processing Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">video_processing_toolkit.video_processing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for video_processing_toolkit.video_processing</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ffmpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<div class="viewcode-block" id="get_frame_types">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.get_frame_types">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_frame_types</span><span class="p">(</span><span class="n">video_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to extract the type of each frame in a video using ffprobe.</span>
+<span class="sd">    The frame types are typically:</span>
+<span class="sd">    - &#39;I&#39; (Intra-coded): A full image</span>
+<span class="sd">    - &#39;P&#39;(Predicted): Stores only the difference from the previous frame</span>
+<span class="sd">    - &#39;B&#39; (Bidirectional): Stores differences using both previous and next frames.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        video_file (str): Path to the input video file.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Zip: A zip object containing tuples of (frame_index, frame_type),</span>
+<span class="sd">             where frame_index is an integer and frame_type is a string (&#39;I&#39;, &#39;P&#39;, &#39;B&#39;).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;ffprobe -v error -show_entries frame=pict_type -of default=noprint_wrappers=1&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span> <span class="o">+</span> <span class="p">[</span><span class="n">video_file</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    <span class="n">frame_types</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;pict_type=&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">frame_types</span><span class="p">)),</span> <span class="n">frame_types</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_all_i_keyframes">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.save_all_i_keyframes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_all_i_keyframes</span><span class="p">(</span><span class="n">video_file</span><span class="p">,</span> <span class="n">path_out</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to extract and save all I-frames of a complete video as image files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        video_file(str): Path to the input video file</span>
+<span class="sd">        path_out(str): Directory where the extracted frames will be saved.</span>
+<span class="sd">    Returns: </span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path_out</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">frame_types</span> <span class="o">=</span> <span class="n">get_frame_types</span><span class="p">(</span><span class="n">video_file</span><span class="p">)</span>
+    <span class="n">i_frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">frame_types</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;I&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">i_frames</span><span class="p">:</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video_file</span><span class="p">)</span>
+        <span class="n">fps</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">)</span>
+
+        <span class="n">blank_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">frame_no</span> <span class="ow">in</span> <span class="n">i_frames</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_POS_FRAMES</span><span class="p">,</span> <span class="n">frame_no</span><span class="p">)</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+            <span class="n">timestamp_sec</span> <span class="o">=</span> <span class="n">frame_no</span> <span class="o">/</span> <span class="n">fps</span>
+            <span class="n">hh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp_sec</span> <span class="o">//</span> <span class="mi">3600</span><span class="p">)</span>
+            <span class="n">mm</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">timestamp_sec</span> <span class="o">%</span> <span class="mi">3600</span><span class="p">)</span> <span class="o">//</span> <span class="mi">60</span><span class="p">)</span>
+            <span class="n">ss</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp_sec</span> <span class="o">%</span> <span class="mi">60</span><span class="p">)</span>
+            <span class="n">timestamp_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hh</span><span class="si">:</span><span class="s2">02d</span><span class="si">}{</span><span class="n">mm</span><span class="si">:</span><span class="s2">02d</span><span class="si">}{</span><span class="n">ss</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="n">create_img_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;frame_</span><span class="si">{</span><span class="n">timestamp_str</span><span class="si">}</span><span class="s2">.jpg&quot;</span>
+
+            <span class="n">full_frame_saving_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_out</span><span class="p">,</span> <span class="n">create_img_name</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">full_frame_saving_path</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saved: &#39;</span> <span class="o">+</span> <span class="n">full_frame_saving_path</span><span class="p">)</span>
+
+            <span class="n">blank_cnt</span> <span class="o">=</span> <span class="n">blank_cnt</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done extracting frames.</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> frames extracted&quot;</span> <span class="o">%</span> <span class="n">blank_cnt</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No I-frames in &#39;</span> <span class="o">+</span> <span class="n">video_file</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="save_all_i_keyframes_between_two_timestamps">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.save_all_i_keyframes_between_two_timestamps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_all_i_keyframes_between_two_timestamps</span><span class="p">(</span><span class="n">video_file</span><span class="p">,</span> <span class="n">path_out</span><span class="p">,</span> <span class="n">hh_mm_ss_start</span><span class="p">,</span> <span class="n">hh_mm_ss_end</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to extract and save all the I-frames of a complete video as image files between two timestamps.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        video_file(str): Path to the input video file</span>
+<span class="sd">        path_out(str): The output folder to save all the output frames</span>
+<span class="sd">        hh_mm_ss_start(str): the time starting time stamp</span>
+<span class="sd">        hh_mm_ss_end(str): the time ending time stamp.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path_out</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video_file</span><span class="p">)</span>
+
+    <span class="n">time_data_split_start</span> <span class="o">=</span> <span class="n">hh_mm_ss_start</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">get_hours_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">get_mins_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">get_secs_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">time_in_sec_start</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_start</span><span class="p">)</span>
+
+    <span class="n">time_data_split_end</span> <span class="o">=</span> <span class="n">hh_mm_ss_end</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">get_hours_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">get_mins_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">get_secs_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">time_in_sec_end</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_end</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_end</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_end</span><span class="p">)</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">))</span>  <span class="c1"># get the frame per seconds</span>
+
+    <span class="c1"># let&#39;s say, we need to compute from 17th sec of the video. Hence, the number of frames will be traversed</span>
+    <span class="c1"># after 17th sec  is completed is 17 * 30 = 510 (by taking an example of 30  fps video) Hence, at the end of</span>
+    <span class="c1"># 16th sec, we wil traverse 16 * 30 = 480 frames. So, the 17th sec frame counting will start from 481 th frame</span>
+    <span class="n">first_available_frame_index</span> <span class="o">=</span> <span class="p">((</span><span class="n">time_in_sec_start</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span> <span class="o">-</span> <span class="n">fps</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">last_available_frame_index</span> <span class="o">=</span> <span class="n">time_in_sec_end</span> <span class="o">*</span> <span class="n">fps</span>
+
+    <span class="n">frame_types</span> <span class="o">=</span> <span class="n">get_frame_types</span><span class="p">(</span><span class="n">video_file</span><span class="p">)</span>
+    <span class="n">i_frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">frame_types</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;I&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">i_frames</span><span class="p">:</span>
+
+        <span class="n">blank_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">frame_no</span> <span class="ow">in</span> <span class="n">i_frames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">first_available_frame_index</span> <span class="o">&lt;=</span> <span class="n">frame_no</span> <span class="o">&lt;=</span> <span class="n">last_available_frame_index</span><span class="p">:</span>
+                <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_POS_FRAMES</span><span class="p">,</span> <span class="n">frame_no</span><span class="p">)</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+
+                <span class="n">timestamp_sec</span> <span class="o">=</span> <span class="n">frame_no</span> <span class="o">/</span> <span class="n">fps</span>
+                <span class="n">hh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp_sec</span> <span class="o">//</span> <span class="mi">3600</span><span class="p">)</span>
+                <span class="n">mm</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">timestamp_sec</span> <span class="o">%</span> <span class="mi">3600</span><span class="p">)</span> <span class="o">//</span> <span class="mi">60</span><span class="p">)</span>
+                <span class="n">ss</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp_sec</span> <span class="o">%</span> <span class="mi">60</span><span class="p">)</span>
+                <span class="n">timestamp_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hh</span><span class="si">:</span><span class="s2">02d</span><span class="si">}{</span><span class="n">mm</span><span class="si">:</span><span class="s2">02d</span><span class="si">}{</span><span class="n">ss</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">create_img_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;frame_</span><span class="si">{</span><span class="n">timestamp_str</span><span class="si">}</span><span class="s2">.jpg&quot;</span>
+
+                <span class="n">full_frame_saving_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_out</span><span class="p">,</span> <span class="n">create_img_name</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">full_frame_saving_path</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+
+                <span class="n">blank_cnt</span> <span class="o">=</span> <span class="n">blank_cnt</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done extracting frames.</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> frames extracted&quot;</span> <span class="o">%</span> <span class="n">blank_cnt</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No I-frames in &#39;</span> <span class="o">+</span> <span class="n">video_file</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="save_all_p_keyframes">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.save_all_p_keyframes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_all_p_keyframes</span><span class="p">(</span><span class="n">video_file</span><span class="p">,</span> <span class="n">path_out</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to extract all P-frames from a complete video as image files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        video_file(str): Path to the input video file</span>
+<span class="sd">        path_out(str): Directory where the extracted frames will be saved.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path_out</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">frame_types</span> <span class="o">=</span> <span class="n">get_frame_types</span><span class="p">(</span><span class="n">video_file</span><span class="p">)</span>
+    <span class="n">i_frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">frame_types</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">i_frames</span><span class="p">:</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video_file</span><span class="p">)</span>
+        <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">))</span>
+
+        <span class="n">blank_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">frame_no</span> <span class="ow">in</span> <span class="n">i_frames</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_POS_FRAMES</span><span class="p">,</span> <span class="n">frame_no</span><span class="p">)</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+            <span class="n">timestamp_sec</span> <span class="o">=</span> <span class="n">frame_no</span> <span class="o">/</span> <span class="n">fps</span>
+            <span class="n">hh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp_sec</span> <span class="o">//</span> <span class="mi">3600</span><span class="p">)</span>
+            <span class="n">mm</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">timestamp_sec</span> <span class="o">%</span> <span class="mi">3600</span><span class="p">)</span> <span class="o">//</span> <span class="mi">60</span><span class="p">)</span>
+            <span class="n">ss</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp_sec</span> <span class="o">%</span> <span class="mi">60</span><span class="p">)</span>
+            <span class="n">timestamp_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hh</span><span class="si">:</span><span class="s2">02d</span><span class="si">}{</span><span class="n">mm</span><span class="si">:</span><span class="s2">02d</span><span class="si">}{</span><span class="n">ss</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">create_img_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;frame_</span><span class="si">{</span><span class="n">timestamp_str</span><span class="si">}</span><span class="s2">.jpg&quot;</span>
+
+            <span class="n">full_frame_saving_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_out</span><span class="p">,</span> <span class="n">create_img_name</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">full_frame_saving_path</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saved: &#39;</span> <span class="o">+</span> <span class="n">full_frame_saving_path</span><span class="p">)</span>
+
+            <span class="n">blank_cnt</span> <span class="o">=</span> <span class="n">blank_cnt</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done extracting frames.</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> frames extracted&quot;</span> <span class="o">%</span> <span class="n">blank_cnt</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No P-frames in &#39;</span> <span class="o">+</span> <span class="n">video_file</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="save_all_p_keyframes_between_two_timestamps">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.save_all_p_keyframes_between_two_timestamps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_all_p_keyframes_between_two_timestamps</span><span class="p">(</span><span class="n">video_file</span><span class="p">,</span> <span class="n">path_out</span><span class="p">,</span> <span class="n">hh_mm_ss_start</span><span class="p">,</span> <span class="n">hh_mm_ss_end</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to extract  and save all the p-key frames of a complete video.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        video_file(str): Path to the input video file</span>
+<span class="sd">        path_out(str): Directory where the extracted frames will be saved</span>
+<span class="sd">        hh_mm_ss_start(str): the time starting time stamp</span>
+<span class="sd">        hh_mm_ss_end(str): the time ending time stamp.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path_out</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video_file</span><span class="p">)</span>
+
+    <span class="n">time_data_split_start</span> <span class="o">=</span> <span class="n">hh_mm_ss_start</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">get_hours_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">get_mins_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">get_secs_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">time_in_sec_start</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_start</span><span class="p">)</span>
+
+    <span class="n">time_data_split_end</span> <span class="o">=</span> <span class="n">hh_mm_ss_end</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">get_hours_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">get_mins_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">get_secs_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">time_in_sec_end</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_end</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_end</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_end</span><span class="p">)</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">))</span>  <span class="c1"># get the frame per seconds</span>
+
+    <span class="c1"># let&#39;s say, we need to compute from 17th sec of the video. Hence, the number of frames will be traversed</span>
+    <span class="c1"># after 17th sec  is completed is 17 * 30 = 510 (by taking an example of 30  fps video) Hence, at the end of</span>
+    <span class="c1"># 16th sec, we wil traverse 16 * 30 = 480 frames. So, the 17th sec frame counting will start from 481 th frame</span>
+    <span class="n">first_available_frame_index</span> <span class="o">=</span> <span class="p">((</span><span class="n">time_in_sec_start</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span> <span class="o">-</span> <span class="n">fps</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">last_available_frame_index</span> <span class="o">=</span> <span class="n">time_in_sec_end</span> <span class="o">*</span> <span class="n">fps</span>
+
+    <span class="n">frame_types</span> <span class="o">=</span> <span class="n">get_frame_types</span><span class="p">(</span><span class="n">video_file</span><span class="p">)</span>
+    <span class="n">i_frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">frame_types</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">i_frames</span><span class="p">:</span>
+
+        <span class="n">blank_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">frame_no</span> <span class="ow">in</span> <span class="n">i_frames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">first_available_frame_index</span> <span class="o">&lt;=</span> <span class="n">frame_no</span> <span class="o">&lt;=</span> <span class="n">last_available_frame_index</span><span class="p">:</span>
+                <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_POS_FRAMES</span><span class="p">,</span> <span class="n">frame_no</span><span class="p">)</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+                <span class="n">timestamp_sec</span> <span class="o">=</span> <span class="n">frame_no</span> <span class="o">/</span> <span class="n">fps</span>
+                <span class="n">hh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp_sec</span> <span class="o">//</span> <span class="mi">3600</span><span class="p">)</span>
+                <span class="n">mm</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">timestamp_sec</span> <span class="o">%</span> <span class="mi">3600</span><span class="p">)</span> <span class="o">//</span> <span class="mi">60</span><span class="p">)</span>
+                <span class="n">ss</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp_sec</span> <span class="o">%</span> <span class="mi">60</span><span class="p">)</span>
+                <span class="n">timestamp_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hh</span><span class="si">:</span><span class="s2">02d</span><span class="si">}{</span><span class="n">mm</span><span class="si">:</span><span class="s2">02d</span><span class="si">}{</span><span class="n">ss</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">create_img_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;frame_</span><span class="si">{</span><span class="n">timestamp_str</span><span class="si">}</span><span class="s2">.jpg&quot;</span>
+
+                <span class="n">full_frame_saving_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_out</span><span class="p">,</span> <span class="n">create_img_name</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">full_frame_saving_path</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saved: &#39;</span> <span class="o">+</span> <span class="n">full_frame_saving_path</span><span class="p">)</span>
+
+                <span class="n">blank_cnt</span> <span class="o">=</span> <span class="n">blank_cnt</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done extracting frames.</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> frames extracted&quot;</span> <span class="o">%</span> <span class="n">blank_cnt</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No P-frames in &#39;</span> <span class="o">+</span> <span class="n">video_file</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="convert_video">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.convert_video">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_video</span><span class="p">(</span><span class="n">inputed_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to convert the video file into .avi format and save it into current project directory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inputed_file(str): Path of the input video file.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The name of the output video file, which automatically takes the name from current time and save the</span>
+<span class="sd">        file into current project folder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">-%H%M%S&quot;</span><span class="p">)</span>
+    <span class="n">video_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.avi&quot;</span>
+    <span class="n">ff</span> <span class="o">=</span> <span class="n">ffmpy</span><span class="o">.</span><span class="n">FFmpeg</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="n">inputed_file</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span> <span class="n">outputs</span><span class="o">=</span><span class="p">{</span><span class="n">video_name</span><span class="p">:</span> <span class="s1">&#39; -c:a mp3 -c:v mpeg4&#39;</span><span class="p">})</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">cmd</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">video_name</span></div>
+
+
+
+<div class="viewcode-block" id="compute_frame_per_sec_rate">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.compute_frame_per_sec_rate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_frame_per_sec_rate</span><span class="p">(</span><span class="n">video_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the framerate (frames per second) of the video using OpenCV.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        video_file (str): Path to the video file.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The framerate of the video.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot open video file: </span><span class="si">{</span><span class="n">video_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="n">fps</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">)</span>
+    <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fps</span></div>
+
+
+<div class="viewcode-block" id="frames_to_video">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.frames_to_video">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">frames_to_video</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">fps</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function reads all the individual frames, saved in a directory and then use them to create a video.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_path(str): Path of the directory where the images or frames are saved</span>
+<span class="sd">        fps(int): The Frame rate of the created video stream</span>
+<span class="sd">        output_path(str): The path where the constructed video will be saved.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">f</span><span class="p">))]</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span> 
+       
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">input_path</span> <span class="o">+</span> <span class="n">files</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="n">image_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+    <span class="n">fourcc</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">fourcc</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">image_array</span><span class="p">)):</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_array</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="video_to_all_frames">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.video_to_all_frames">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">video_to_all_frames</span><span class="p">(</span><span class="n">input_loc</span><span class="p">,</span> <span class="n">output_loc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to extract all the frames from input video file and save them as separate frames in an output directory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_loc (str): Path to the input video file</span>
+<span class="sd">        output_loc (str): Directory where the frames will be saved.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">output_loc</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="c1"># Log the time</span>
+    <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Start capturing the feed</span>
+    <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">input_loc</span><span class="p">)</span>
+
+    <span class="c1"># Find the number of frames</span>
+    <span class="n">video_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_COUNT</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of frames: &quot;</span><span class="p">,</span> <span class="n">video_length</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Start converting the video</span>
+    <span class="k">while</span> <span class="n">cap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+        <span class="c1"># Extract the frame</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">output_loc</span> <span class="o">+</span> <span class="s2">&quot;/</span><span class="si">%#05d</span><span class="s2">.jpg&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">frame</span><span class="p">)</span>  <span class="c1"># Write the results back to output location.</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># If there are no more frames left</span>
+        <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">video_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">time_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  <span class="c1"># Log the time again</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>  <span class="c1"># Release the feed</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done extracting frames.</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> frames extracted&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;It took </span><span class="si">%d</span><span class="s2"> seconds for conversion.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_end</span> <span class="o">-</span> <span class="n">time_start</span><span class="p">))</span>
+            <span class="k">break</span></div>
+
+
+
+<div class="viewcode-block" id="extract_images_regular_interval">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.extract_images_regular_interval">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_images_regular_interval</span><span class="p">(</span><span class="n">path_in</span><span class="p">,</span> <span class="n">path_out</span><span class="p">,</span> <span class="n">time_interval_in_sec</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to extract the frames in every given &quot;time_interval&quot; e.g. 1 sec, 5 sec etc. from input video file</span>
+<span class="sd">    and save them as separate frames in an output directory.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        path_in(str): Input video file</span>
+<span class="sd">        path_out(str): Directory where the extracted frames will be saved</span>
+<span class="sd">        time_interval_in_sec(int): the time interval of the sampling, mention in seconds; we convert it into milliseconds.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    Resources:</span>
+<span class="sd">           https://www.futurelearn.com/info/courses/introduction-to-image-analysis-for-plant-phenotyping/0/steps/305359</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">vidcap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">path_in</span><span class="p">)</span>
+    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">time_interval_in_millisec</span> <span class="o">=</span> <span class="n">time_interval_in_sec</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># converting it into milliseconds</span>
+
+    <span class="c1"># Another way to extract the frame, without finding the frame number,</span>
+    <span class="c1"># is by using the time in milliseconds directly using CAP_PROP_POS_MSEC instead</span>
+    <span class="k">while</span> <span class="n">success</span><span class="p">:</span>
+        <span class="n">vidcap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_POS_MSEC</span><span class="p">,</span> <span class="p">(</span><span class="n">count</span> <span class="o">*</span> <span class="n">time_interval_in_millisec</span><span class="p">))</span>
+        <span class="n">success</span><span class="p">,</span> <span class="n">image</span> <span class="o">=</span> <span class="n">vidcap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Read a new frame: &#39;</span><span class="p">,</span> <span class="n">success</span><span class="p">)</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">path_out</span> <span class="o">+</span> <span class="s2">&quot;/</span><span class="si">%#05d</span><span class="s2">.jpg&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">image</span><span class="p">)</span>  <span class="c1"># save frame as JPEG file</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">vidcap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="extract_images_at_particular_timestamp">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.extract_images_at_particular_timestamp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_images_at_particular_timestamp</span><span class="p">(</span><span class="n">path_in</span><span class="p">,</span> <span class="n">path_out</span><span class="p">,</span> <span class="n">hh_mm_ss</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to extract the frame at a particular time stamp; Need to know the number of frames per second and the</span>
+<span class="sd">    timestamp in the video , we want to take frame from, we can easily calculate the frame number we want.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path_in(str): Input video file</span>
+<span class="sd">        path_out (str): Directory where the extracted frame will be saved</span>
+<span class="sd">        hh_mm_ss(str): The timestamp in &quot;HH:MM:SS&quot; format where the frame should be extracted.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># video_avi = convert_video(path_in)  # convert into video_avi file first to facilitate the reading of video file</span>
+    <span class="n">vidcap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">path_in</span><span class="p">)</span>  <span class="c1"># read the video</span>
+
+    <span class="n">time_data_split</span> <span class="o">=</span> <span class="n">hh_mm_ss</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">get_hours</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">get_mins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">get_secs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">time_in_millisec</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+    <span class="n">time_in_sec</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs</span><span class="p">)</span>
+    <span class="n">get_fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">compute_frame_per_sec_rate</span><span class="p">(</span><span class="n">path_in</span><span class="p">))</span>
+
+    <span class="c1"># See carefully, the following multiplication will give the last frame of time stamp &#39;time_in_sec&#39;. Because on</span>
+    <span class="c1"># second 1, we will have 30 frames (e.g. FPS = 30), on second 2, we will have 2*30 = 60 frames then on &#39;time_in_sec&#39;</span>
+    <span class="c1"># we will have time_in_sec*30 frames. So the following multiplication will give the last frame of the `time_in_sec`</span>
+    <span class="n">frame_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">get_fps</span> <span class="o">*</span> <span class="n">time_in_sec</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">while</span> <span class="n">vidcap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+        <span class="n">vidcap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_POS_MSEC</span><span class="p">,</span> <span class="n">time_in_millisec</span><span class="p">)</span>
+        <span class="n">success</span><span class="p">,</span> <span class="n">image</span> <span class="o">=</span> <span class="n">vidcap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Read a new frame: &#39;</span><span class="p">,</span> <span class="n">success</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">path_out</span> <span class="o">+</span> <span class="s2">&quot;/</span><span class="si">%#05d</span><span class="s2">.jpg&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">frame_id</span> <span class="o">+</span> <span class="n">count</span><span class="p">),</span> <span class="n">image</span><span class="p">)</span>  <span class="c1"># save frame as JPEG file</span>
+            <span class="k">break</span>
+
+    <span class="n">vidcap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="extract_images_between_two_timestamps">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.extract_images_between_two_timestamps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_images_between_two_timestamps</span><span class="p">(</span><span class="n">path_in</span><span class="p">,</span> <span class="n">path_out</span><span class="p">,</span> <span class="n">hh_mm_ss_start</span><span class="p">,</span> <span class="n">hh_mm_ss_end</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to extract all the frames within two timestamps; Need to know the number of frames per second and the</span>
+<span class="sd">    start and end timestamp in the video.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path_in(str): Path to the input video file</span>
+<span class="sd">        path_out(str): Directory where the extracted frames will be saved</span>
+<span class="sd">        hh_mm_ss_start (str): The start timestamp in &quot;HH:MM:SS&quot; format</span>
+<span class="sd">        hh_mm_ss_end (str): The end timestamp in &quot;HH:MM:SS&quot; format.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vidcap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">path_in</span><span class="p">)</span>  <span class="c1"># read the video</span>
+
+    <span class="n">time_data_split_start</span> <span class="o">=</span> <span class="n">hh_mm_ss_start</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">get_hours_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">get_mins_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">get_secs_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">time_in_millisec_start</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_start</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+    <span class="n">time_in_sec_start</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_start</span><span class="p">)</span>
+
+    <span class="n">time_data_split_end</span> <span class="o">=</span> <span class="n">hh_mm_ss_end</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">get_hours_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">get_mins_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">get_secs_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">time_in_sec_end</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_end</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_end</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_end</span><span class="p">)</span>
+
+    <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vidcap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">))</span>  <span class="c1"># get the frame per seconds</span>
+    <span class="n">vidcap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_POS_MSEC</span><span class="p">,</span> <span class="n">time_in_millisec_start</span><span class="p">)</span>  <span class="c1"># setting the pointer to read from this time stamp</span>
+
+    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># let&#39;s say, we need to compute from 17th sec of the video. Hence, the number of frames will be traversed</span>
+    <span class="c1"># after 17th sec  is completed is 17 * 30 = 510 (by taking an example of 30  fps video)</span>
+    <span class="c1"># Hence, at the end of 16th sec, we wil traverse 16 * 30 = 480 frames. So, the 17th sec frame counting will start</span>
+    <span class="c1"># from 481 th frame</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="p">((</span><span class="n">time_in_sec_start</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span> <span class="o">-</span> <span class="n">fps</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">last_available_frame</span> <span class="o">=</span> <span class="n">time_in_sec_end</span> <span class="o">*</span> <span class="n">fps</span>
+
+    <span class="c1"># at each time stamp, we have fps number of frames. Hence, at the last time stamp, we will have :</span>
+    <span class="c1"># (time_in_sec_end * fps) number of frames</span>
+    <span class="k">while</span> <span class="n">success</span><span class="p">:</span>
+        <span class="c1"># Extract the frames</span>
+        <span class="n">success</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">vidcap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Read a new frame: &#39;</span><span class="p">,</span> <span class="n">success</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">path_out</span> <span class="o">+</span> <span class="s2">&quot;/</span><span class="si">%#05d</span><span class="s2">.jpg&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">frame</span><span class="p">)</span>  <span class="c1"># save frame as JPEG file</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># If there are no more frames left</span>
+        <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="n">last_available_frame</span><span class="p">:</span>
+            <span class="n">vidcap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>  <span class="c1"># Release the feed</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done extracting frames.</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> frames extracted&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span>
+            <span class="k">break</span></div>
+
+
+
+<div class="viewcode-block" id="extract_regular_interval_images_between_two_timestamps">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.extract_regular_interval_images_between_two_timestamps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_regular_interval_images_between_two_timestamps</span><span class="p">(</span><span class="n">path_in</span><span class="p">,</span> <span class="n">path_out</span><span class="p">,</span> <span class="n">hh_mm_ss_start</span><span class="p">,</span> <span class="n">hh_mm_ss_end</span><span class="p">,</span>
+                                                           <span class="n">time_interval_in_sec</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to extract frames after given regular intervals within two timestamps; Need to know the number of</span>
+<span class="sd">    frames per second and the start and end timestamp in the video.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path_in (str): Path to the input video file</span>
+<span class="sd">        path_out (str): Directory where the extracted frames will be saved</span>
+<span class="sd">        hh_mm_ss_start (str): The start timestamp in &quot;HH:MM:SS&quot; format</span>
+<span class="sd">        hh_mm_ss_end (str): The end timestamp in &quot;HH:MM:SS&quot; format</span>
+<span class="sd">        time_interval_in_sec (int): The time interval (in seconds) between each frame extraction.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vidcap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">path_in</span><span class="p">)</span>  <span class="c1"># read the video</span>
+
+    <span class="n">time_data_split_start</span> <span class="o">=</span> <span class="n">hh_mm_ss_start</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">get_hours_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">get_mins_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">get_secs_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_start</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">time_in_millisec_start</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_start</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+    <span class="n">time_in_sec_start</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_start</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_start</span><span class="p">)</span>
+
+    <span class="n">time_data_split_end</span> <span class="o">=</span> <span class="n">hh_mm_ss_end</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">get_hours_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">get_mins_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">get_secs_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_data_split_end</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="c1"># time_in_millisec_end = (get_hours_end * 60 * 60 + get_mins_end * 60 + get_secs_end)*1000</span>
+    <span class="n">time_in_sec_end</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_hours_end</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_mins_end</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">get_secs_end</span><span class="p">)</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vidcap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">))</span>  <span class="c1"># get the frame per seconds</span>
+
+    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># let&#39;s say, we need to compute from 17th sec of the video. Hence, the number of frames will be traversed</span>
+    <span class="c1"># after 17th sec  is completed is 17 * 30 = 510 (by taking an example of 30  fps video)</span>
+    <span class="c1"># Hence, at the end of 16th sec, we wil traverse 16 * 30 = 480 frames. So, the 17th sec frame counting will start</span>
+    <span class="c1"># from 481 th frame</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="p">((</span><span class="n">time_in_sec_start</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span> <span class="o">-</span> <span class="n">fps</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">last_available_frame</span> <span class="o">=</span> <span class="n">time_in_sec_end</span> <span class="o">*</span> <span class="n">fps</span>
+
+    <span class="c1"># at each time stamp, we have fps number of frames. Hence, at the last time stamp, we will have :</span>
+    <span class="c1"># (time_in_sec_end * fps) number of frames</span>
+
+    <span class="n">time_interval_in_millisec</span> <span class="o">=</span> <span class="n">time_interval_in_sec</span> <span class="o">*</span> <span class="mi">1000</span>
+
+    <span class="n">blank_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">success</span><span class="p">:</span>
+
+        <span class="n">frame_pointer</span> <span class="o">=</span> <span class="n">time_in_millisec_start</span> <span class="o">+</span> <span class="p">(</span><span class="n">blank_cnt</span> <span class="o">*</span> <span class="n">time_interval_in_millisec</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">frame_pointer</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">time_in_sec_end</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">):</span>
+            <span class="k">break</span>
+        <span class="c1"># setting the pointer to read from this time stamp</span>
+        <span class="n">vidcap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_POS_MSEC</span><span class="p">,</span> <span class="n">frame_pointer</span><span class="p">)</span>
+        <span class="c1"># Extract the frames</span>
+        <span class="n">success</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">vidcap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Read a new frame: &#39;</span><span class="p">,</span> <span class="n">success</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">path_out</span> <span class="o">+</span> <span class="s2">&quot;/</span><span class="si">%#05d</span><span class="s2">.jpg&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>  <span class="c1"># save frame as JPEG file</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">blank_cnt</span> <span class="o">=</span> <span class="n">blank_cnt</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># If there are no more frames left</span>
+        <span class="c1"># if count &gt; last_available_frame:</span>
+    <span class="n">vidcap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>  <span class="c1"># Release the feed</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done extracting frames.</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> frames extracted&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span></div>
+
+    <span class="c1"># break</span>
+
+<div class="viewcode-block" id="process_input_video_give_video_output">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_processing/index.html#video_processing_toolkit.video_processing.process_input_video_give_video_output">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_input_video_give_video_output</span><span class="p">(</span><span class="n">input_loc</span><span class="p">,</span> <span class="n">output_loc</span><span class="p">,</span> <span class="n">function_to_apply</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function to apply the processing on each frames from input video file and create another video.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_loc: Input video file</span>
+<span class="sd">            output_loc: The path of output video file</span>
+<span class="sd">            function_to_apply : The function in which the processing will be applied. Remember, this function should</span>
+<span class="sd">            take opencv frame i.e. a numpy array (nd.array) as the input and will return the same i.e. a numpy array.</span>
+<span class="sd">        Example usage :</span>
+<span class="sd">            process_input_video_give_video_output(&quot;input_video_path&quot;, &quot;output_video_path&quot;,</span>
+<span class="sd">            handlle_nils_field_segmentation)</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">get_fps</span> <span class="o">=</span> <span class="n">compute_frame_per_sec_rate</span><span class="p">(</span><span class="n">input_loc</span><span class="p">)</span>
+
+        <span class="c1"># Log the time</span>
+        <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Start capturing the feed</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">input_loc</span><span class="p">)</span>
+
+        <span class="c1"># Find the number of frames</span>
+        <span class="n">video_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_COUNT</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of frames: &quot;</span><span class="p">,</span> <span class="n">video_length</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting video..</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Just to get the size of image frames</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">cap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="c1"># cap.release()  # Release the feed</span>
+                <span class="k">break</span>
+
+        <span class="n">fourcc</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;4&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span><span class="n">output_loc</span><span class="p">,</span> <span class="n">fourcc</span><span class="p">,</span> <span class="n">get_fps</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+        <span class="c1"># Start converting the video</span>
+        <span class="k">while</span> <span class="n">cap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+            <span class="c1"># Extract the frame</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done processing the BAD frame </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">video_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">time_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  <span class="c1"># Log the time again</span>
+                    <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>  <span class="c1"># Release the feed</span>
+
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;It took </span><span class="si">%d</span><span class="s2"> seconds for conversion and last frame was BAD&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_end</span> <span class="o">-</span> <span class="n">time_start</span><span class="p">))</span>
+                    <span class="k">break</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+
+            <span class="n">masked_2</span> <span class="o">=</span> <span class="n">function_to_apply</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">masked_2</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done processing the GOOD frame </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span>
+
+            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="c1"># If there are no more frames left</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">video_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">time_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  <span class="c1"># Log the time again</span>
+                <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>  <span class="c1"># Release the feed</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done extracting frames.</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> frames extracted&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;It took </span><span class="si">%d</span><span class="s2"> seconds for conversion.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_end</span> <span class="o">-</span> <span class="n">time_start</span><span class="p">))</span>
+                <span class="k">break</span>
+
+        <span class="n">out</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alyssia Fourali, Loic Scoth, Mohamed Said Aimen Lamri, Gaspar Henniaux.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

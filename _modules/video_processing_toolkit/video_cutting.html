@@ -1,0 +1,188 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>video_processing_toolkit.video_cutting &mdash; Video Processing Toolkit 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Video Processing Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Video Processing Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Video Processing Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">video_processing_toolkit.video_cutting</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for video_processing_toolkit.video_cutting</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.video_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_frame_per_sec_rate</span>
+
+<div class="viewcode-block" id="get_clip">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_cutting/index.html#video_processing_toolkit.video_cutting.get_clip">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_clip</span><span class="p">(</span><span class="n">input_filename</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cuts a video using ffmpeg while preserving the original framerate and </span>
+<span class="sd">    forcing one I-frame per second for clean frame extraction.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_filename (str): Path to the input video.</span>
+<span class="sd">        output_filename (str): Path to save the output video.</span>
+<span class="sd">        start_time (float): Start time in seconds.</span>
+<span class="sd">        end_time (float): End time in seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">framerate</span> <span class="o">=</span> <span class="n">compute_frame_per_sec_rate</span><span class="p">(</span><span class="n">input_filename</span><span class="p">)</span>
+    <span class="n">gop_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">framerate</span><span class="p">)</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;ffmpeg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-y&quot;</span><span class="p">,</span>                           <span class="c1"># Overwrite output file without asking</span>
+        <span class="s2">&quot;-ss&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">start_time</span><span class="p">),</span>        <span class="c1"># Start time of the clip (in seconds)</span>
+        <span class="s2">&quot;-to&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_time</span><span class="p">),</span>          <span class="c1"># End time of the clip</span>
+        <span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="n">input_filename</span><span class="p">,</span>          <span class="c1"># Input video file</span>
+        <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">framerate</span><span class="p">),</span>          <span class="c1"># Set output video framerate</span>
+        <span class="s2">&quot;-c:v&quot;</span><span class="p">,</span> <span class="s2">&quot;libx264&quot;</span><span class="p">,</span>             <span class="c1"># Encode video using H.264 codec</span>
+        <span class="s2">&quot;-crf&quot;</span><span class="p">,</span> <span class="s2">&quot;23&quot;</span><span class="p">,</span>                  <span class="c1"># Constant Rate Factor (quality setting, lower is better quality)</span>
+        <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">gop_size</span><span class="p">),</span>           <span class="c1"># Group of Pictures size (distance between I-frames)</span>
+        <span class="s2">&quot;-keyint_min&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">gop_size</span><span class="p">),</span> <span class="c1"># Minimum interval between I-frames (set equal to GOP size for forced I-frame interval)</span>
+        <span class="s2">&quot;-sc_threshold&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>         <span class="c1"># Scene change threshold (0 disables scene detection for I-frames)</span>
+        <span class="s2">&quot;-preset&quot;</span><span class="p">,</span> <span class="s2">&quot;slow&quot;</span><span class="p">,</span>            <span class="c1"># Compression efficiency vs. speed</span>
+        <span class="s2">&quot;-movflags&quot;</span><span class="p">,</span> <span class="s2">&quot;+faststart&quot;</span><span class="p">,</span>    <span class="c1"># Optimize MP4 for web streaming</span>
+        <span class="s2">&quot;-c:a&quot;</span><span class="p">,</span> <span class="s2">&quot;aac&quot;</span><span class="p">,</span>                <span class="c1"># Encode audio using AAC codec</span>
+        <span class="n">output_filename</span>               <span class="c1"># Output video file path</span>
+    <span class="p">]</span>
+
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cut_video_clips">
+<a class="viewcode-back" href="../../autoapi/video_processing_toolkit/video_cutting/index.html#video_processing_toolkit.video_cutting.cut_video_clips">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cut_video_clips</span><span class="p">(</span><span class="n">input_filename</span><span class="p">,</span> <span class="n">output_file_path</span><span class="p">,</span> <span class="n">time_stamp_start_1</span><span class="p">,</span> <span class="n">time_stamp_end_1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function to read several start and end time stamps, mentioned in two vectors; &quot;time_stamp_start_1&quot; and</span>
+<span class="sd">        &quot;time_stamp_end_1&quot;, to crop the video clips based on these start and end time stamps.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_filename (str): Path of the input video file</span>
+<span class="sd">            output_file_path (str): The path of the output file clip</span>
+<span class="sd">            time_stamp_start_1 (List[str]): The list of start time in HH:MM:SS format</span>
+<span class="sd">            time_stamp_end_1 (List[str]): The list of end time in HH:MM:SS format.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_stamp_start_1</span><span class="p">)):</span>
+            <span class="n">get_clip_start_time</span> <span class="o">=</span> <span class="n">time_stamp_start_1</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+            <span class="n">get_clip_start_time</span> <span class="o">=</span> <span class="n">get_clip_start_time</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+
+            <span class="n">get_clip_end_time</span> <span class="o">=</span> <span class="n">time_stamp_end_1</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+            <span class="n">get_clip_end_time</span> <span class="o">=</span> <span class="n">get_clip_end_time</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+
+            <span class="n">start_time_hr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">get_clip_start_time</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">start_time_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">get_clip_start_time</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">start_time_sec</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">get_clip_start_time</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">end_time_hr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">get_clip_end_time</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">end_time_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">get_clip_end_time</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">end_time_sec</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">get_clip_end_time</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">create_output_file_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">start_time_hr</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">start_time_min</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">start_time_sec</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> \
+                                      <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_time_hr</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_time_min</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_time_sec</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.mp4&#39;</span>
+            <span class="n">output_file_path_complete</span> <span class="o">=</span> <span class="n">output_file_path</span> <span class="o">+</span> <span class="n">create_output_file_name</span>
+
+            <span class="n">total_start_time_in_sec</span> <span class="o">=</span> <span class="n">start_time_hr</span> <span class="o">*</span> <span class="mi">3600</span> <span class="o">+</span> <span class="n">start_time_min</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">start_time_sec</span>
+            <span class="n">total_end_time_in_sec</span> <span class="o">=</span> <span class="n">end_time_hr</span> <span class="o">*</span> <span class="mi">3600</span> <span class="o">+</span> <span class="n">end_time_min</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">end_time_sec</span>
+
+            <span class="n">get_clip</span><span class="p">(</span><span class="n">input_filename</span><span class="p">,</span> <span class="n">output_file_path_complete</span><span class="p">,</span> <span class="n">total_start_time_in_sec</span><span class="p">,</span>
+                                    <span class="n">total_end_time_in_sec</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alyssia Fourali, Loic Scoth, Mohamed Said Aimen Lamri, Gaspar Henniaux.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
