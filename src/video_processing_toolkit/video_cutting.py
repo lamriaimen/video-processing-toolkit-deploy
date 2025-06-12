@@ -18,7 +18,7 @@ def get_clip(input_filename, output_filename, start_time, end_time):
     command = [
         "ffmpeg",
         "-y",                           # Overwrite output file without asking
-        "-ss", str(start_time),        # Start time of the clip (in seconds or HH:MM:SS)
+        "-ss", str(start_time),        # Start time of the clip (in seconds)
         "-to", str(end_time),          # End time of the clip
         "-i", input_filename,          # Input video file
         "-r", str(framerate),          # Set output video framerate

@@ -59,13 +59,13 @@ Installation
 
 .. code-block:: bash
 
-    pip install git+https://github.com/alyssia-fourali/video_processing_toolkit.git
+    pip install git+https://github.com/LoicSc1/video-processing-toolkit.git
 
 Or clone and install in editable mode:
 
 .. code-block:: bash
 
-    git clone https://github.com/alyssia-fourali/video_processing_toolkit.git
+    git clone https://github.com/LoicSc1/video-processing-toolkit.git
     cd video_processing_toolkit
     pip install -e .
 

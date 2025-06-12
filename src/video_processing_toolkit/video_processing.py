@@ -5,8 +5,6 @@ import time
 import ffmpy
 import numpy as np
 import subprocess
-print(f"LOADED MODULE: {__name__}")
-
 
 def get_frame_types(video_file):
     """
@@ -27,7 +25,6 @@ def get_frame_types(video_file):
     frame_types = out.replace('pict_type=', '').split()
     return zip(range(len(frame_types)), frame_types)
 
-
 def save_all_i_keyframes(video_file, path_out):
     """Function to extract and save all I-frames of a complete video as image files.
 
@@ -43,7 +40,6 @@ def save_all_i_keyframes(video_file, path_out):
     i_frames = [x[0] for x in frame_types if x[1] == 'I']
 
     if i_frames:
-        # basename = os.path.splitext(os.path.basename(video_file))[0]
         cap = cv2.VideoCapture(video_file)
         fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -91,7 +87,6 @@ def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
     get_mins_start = int(time_data_split_start[1])
     get_secs_start = int(time_data_split_start[2])
 
-    time_in_millisec_start = (get_hours_start * 60 * 60 + get_mins_start * 60 + get_secs_start) * 1000
     time_in_sec_start = (get_hours_start * 60 * 60 + get_mins_start * 60 + get_secs_start)
 
     time_data_split_end = hh_mm_ss_end.split(":")
@@ -99,12 +94,8 @@ def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
     get_mins_end = int(time_data_split_end[1])
     get_secs_end = int(time_data_split_end[2])
 
-    time_in_millisec_end = (get_hours_end * 60 * 60 + get_mins_end * 60 + get_secs_end) * 1000
     time_in_sec_end = (get_hours_end * 60 * 60 + get_mins_end * 60 + get_secs_end)
     fps = int(cap.get(cv2.CAP_PROP_FPS))  # get the frame per seconds
-
-    # number of frames in video
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # let's say, we need to compute from 17th sec of the video. Hence, the number of frames will be traversed
     # after 17th sec  is completed is 17 * 30 = 510 (by taking an example of 30  fps video) Hence, at the end of
@@ -129,12 +120,10 @@ def save_all_i_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
                 ss = int(timestamp_sec % 60)
                 timestamp_str = f"{hh:02d}{mm:02d}{ss:02d}"
                 create_img_name = f"frame_{timestamp_str}.jpg"
-                #create_img_name = "/" + str(blank_cnt) + "frame_" + str(frame_no) + ".jpg"
 
                 full_frame_saving_path = os.path.join(path_out, create_img_name)
                 cv2.imwrite(full_frame_saving_path, frame)
 
-                # print('Saved: ' + full_frame_saving_path)
 
                 blank_cnt = blank_cnt + 1
         cap.release()
@@ -202,7 +191,6 @@ def save_all_p_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
     get_mins_start = int(time_data_split_start[1])
     get_secs_start = int(time_data_split_start[2])
 
-    time_in_millisec_start = (get_hours_start * 60 * 60 + get_mins_start * 60 + get_secs_start) * 1000
     time_in_sec_start = (get_hours_start * 60 * 60 + get_mins_start * 60 + get_secs_start)
 
     time_data_split_end = hh_mm_ss_end.split(":")
@@ -210,12 +198,8 @@ def save_all_p_keyframes_between_two_timestamps(video_file, path_out, hh_mm_ss_s
     get_mins_end = int(time_data_split_end[1])
     get_secs_end = int(time_data_split_end[2])
 
-    time_in_millisec_end = (get_hours_end * 60 * 60 + get_mins_end * 60 + get_secs_end) * 1000
     time_in_sec_end = (get_hours_end * 60 * 60 + get_mins_end * 60 + get_secs_end)
     fps = int(cap.get(cv2.CAP_PROP_FPS))  # get the frame per seconds
-
-    # number of frames in video
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # let's say, we need to compute from 17th sec of the video. Hence, the number of frames will be traversed
     # after 17th sec  is completed is 17 * 30 = 510 (by taking an example of 30  fps video) Hence, at the end of
@@ -335,10 +319,9 @@ def video_to_all_frames(input_loc, output_loc):
     cap = cv2.VideoCapture(input_loc)
 
     # Find the number of frames
-    video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
+    video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     print("Number of frames: ", video_length)
     count = 0
-    print("Converting video..\n")
 
     # Start converting the video
     while cap.isOpened():
@@ -463,7 +446,6 @@ def extract_images_between_two_timestamps(path_in, path_out, hh_mm_ss_start, hh_
     get_mins_end = int(time_data_split_end[1])
     get_secs_end = int(time_data_split_end[2])
 
-    # time_in_millisec_end = (get_hours_end * 60 * 60 + get_mins_end*60 + get_secs_end)*1000
     time_in_sec_end = (get_hours_end * 60 * 60 + get_mins_end * 60 + get_secs_end)
 
     fps = int(vidcap.get(cv2.CAP_PROP_FPS))  # get the frame per seconds
@@ -628,9 +610,6 @@ def process_input_video_give_video_output(input_loc, output_loc, function_to_app
                 count = count + 1
                 continue
 
-            # get_mask_2 = ColorProcessing.compute_field_mask_cvprw_2018(frame, "threshold_approximation")
-            # masked_2 = cv2.bitwise_and(frame, frame, mask=get_mask_2)
-
             masked_2 = function_to_apply(frame)
             out.write(masked_2)
             print("Done processing the GOOD frame %d" % count)
@@ -647,5 +626,3 @@ def process_input_video_give_video_output(input_loc, output_loc, function_to_app
                 break
 
         out.release()
-
-print(f"LOADED MODULE: {__name__}")
